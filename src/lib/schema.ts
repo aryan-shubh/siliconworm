@@ -194,6 +194,20 @@ export const artifacts = mysqlTable(
   ],
 );
 
+export const runMetrics = mysqlTable(
+  "run_metrics",
+  {
+    runId: varchar("run_id", { length: 36 }).notNull(),
+    name: varchar("name", { length: 64 }).notNull(),
+    step: bigint("step", { mode: "number" }).notNull(),
+    value: double("value").notNull(),
+  },
+  (t) => [
+    uniqueIndex("uniq_run_metric_step").on(t.runId, t.name, t.step),
+    index("idx_run_metric").on(t.runId, t.name),
+  ],
+);
+
 /* Note: metrics live in ClickHouse, not here. Schema there:
  *   metrics(project_id, run_id, name, step UInt64, ts DateTime64(3), value Float64)
  *   ORDER BY (project_id, run_id, name, step)
