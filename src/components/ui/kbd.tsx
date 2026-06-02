@@ -4,8 +4,8 @@ export function Kbd({ children, className }: { children: React.ReactNode; classN
   return (
     <kbd
       className={cn(
-        "inline-flex h-5 min-w-5 items-center justify-center border border-rule bg-ink-2 px-1.5",
-        "font-mono text-[10px] text-bone-dim leading-none",
+        "inline-flex h-5 min-w-5 items-center justify-center rounded border border-line bg-surface px-1.5",
+        "font-mono text-[10px] leading-none text-ink-2",
         className,
       )}
     >

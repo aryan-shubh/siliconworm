@@ -1,112 +1,126 @@
 import Link from "next/link";
 import {
   LayoutGrid, FlaskConical, Database, GitBranch, Bell, Settings,
-  KeyRound, Users, BookOpen,
+  KeyRound, Users, BookOpen, ChevronsUpDown,
 } from "lucide-react";
 import { Brand } from "@/components/brand";
 import { Kbd } from "@/components/ui/kbd";
 import { CURRENT_ORG, CURRENT_USER } from "@/lib/mock";
 
 const PRIMARY = [
-  { href: "/",            label: "projects",    icon: LayoutGrid, kbd: "g p" },
-  { href: "/runs",        label: "all runs",    icon: FlaskConical, kbd: "g r" },
-  { href: "/artifacts",   label: "artifacts",   icon: Database, kbd: "g a" },
-  { href: "/sweeps",      label: "sweeps",      icon: GitBranch, kbd: "g s" },
-  { href: "/alerts",      label: "alerts",      icon: Bell, kbd: "g i" },
+  { href: "/",          label: "Projects",  icon: LayoutGrid },
+  { href: "/runs",      label: "All runs",  icon: FlaskConical },
+  { href: "/artifacts", label: "Artifacts", icon: Database },
+  { href: "/sweeps",    label: "Sweeps",    icon: GitBranch },
+  { href: "/alerts",    label: "Alerts",    icon: Bell },
 ];
 const SECONDARY = [
-  { href: "/team",   label: "team",     icon: Users },
-  { href: "/keys",   label: "api keys", icon: KeyRound },
-  { href: "/docs",   label: "docs",     icon: BookOpen },
-  { href: "/settings", label: "settings", icon: Settings },
+  { href: "/team",     label: "Team",     icon: Users },
+  { href: "/keys",     label: "API keys", icon: KeyRound },
+  { href: "/docs",     label: "Docs",     icon: BookOpen },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function Sidebar() {
   return (
-    <aside className="sticky top-0 flex h-dvh w-[232px] shrink-0 flex-col border-r border-rule bg-ink-2/40">
-      {/* org switcher / brand row */}
-      <div className="border-b border-rule p-3">
-        <Link href="/" className="block px-1">
+    <aside className="sticky top-0 flex h-dvh w-[240px] shrink-0 flex-col border-r border-line bg-surface-2/60">
+      <div className="border-b border-line p-3">
+        <Link href="/" className="block px-1 py-1">
           <Brand />
         </Link>
-        <button className="mt-3 flex w-full items-center justify-between border border-rule bg-ink-3/60 px-2 py-1.5 text-left hover:border-rule-2">
-          <div className="flex items-center gap-2">
-            <div className="grid h-6 w-6 place-items-center bg-lime font-mono text-[10px] text-ink">
+        <button
+          type="button"
+          className="mt-3 flex w-full items-center justify-between gap-2 rounded-md border border-line bg-surface px-2 py-1.5 text-left hover:border-line-strong hover:bg-surface-hover"
+        >
+          <span className="flex min-w-0 items-center gap-2">
+            <span className="grid h-6 w-6 shrink-0 place-items-center rounded-sm bg-accent-soft text-[10px] font-semibold text-accent-ink">
               AL
-            </div>
-            <div className="min-w-0">
-              <div className="truncate text-[12px] text-bone">{CURRENT_ORG.name}</div>
-              <div className="font-mono text-[9px] uppercase tracking-[0.16em] text-bone-faint">team · 14 seats</div>
-            </div>
-          </div>
-          <span className="font-mono text-[10px] text-bone-faint">⇅</span>
+            </span>
+            <span className="min-w-0">
+              <span className="block truncate text-[12px] font-medium text-ink">{CURRENT_ORG.name}</span>
+              <span className="block truncate text-[10px] text-ink-3">Team · 14 seats</span>
+            </span>
+          </span>
+          <ChevronsUpDown className="h-3.5 w-3.5 text-ink-3" />
         </button>
       </div>
 
-      {/* primary nav */}
-      <nav className="flex-1 overflow-y-auto px-2 py-3">
-        <div className="eyebrow px-2 pb-2">workspace</div>
-        <ul className="space-y-px">
-          {PRIMARY.map((it) => (
-            <li key={it.href}>
-              <Link
-                href={it.href}
-                className="group flex items-center justify-between gap-2 rounded-sm px-2 py-1.5 text-[12px] text-bone-dim hover:bg-ink-3 hover:text-bone"
-              >
-                <span className="flex items-center gap-2.5">
-                  <it.icon className="h-3.5 w-3.5" strokeWidth={1.5} />
-                  <span className="font-mono lowercase tracking-wide">{it.label}</span>
-                </span>
-                <span className="font-mono text-[9px] text-bone-faint opacity-0 group-hover:opacity-100">
-                  {it.kbd}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+      <nav className="flex-1 overflow-y-auto px-2 py-3 text-[13px]">
+        <NavGroup label="Workspace">
+          {PRIMARY.map((it) => <NavItem key={it.href} {...it} />)}
+        </NavGroup>
+        <NavGroup label="Account" className="mt-6">
+          {SECONDARY.map((it) => <NavItem key={it.href} {...it} />)}
+        </NavGroup>
 
-        <div className="eyebrow mt-6 px-2 pb-2">account</div>
-        <ul className="space-y-px">
-          {SECONDARY.map((it) => (
-            <li key={it.href}>
-              <Link
-                href={it.href}
-                className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 text-[12px] text-bone-dim hover:bg-ink-3 hover:text-bone"
-              >
-                <it.icon className="h-3.5 w-3.5" strokeWidth={1.5} />
-                <span className="font-mono lowercase tracking-wide">{it.label}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-
-        <div className="mt-8 border border-rule bg-ink-3/40 p-3">
-          <div className="eyebrow mb-1">trial · open beta</div>
-          <div className="font-mono text-[11px] text-bone-dim">
-            <div className="flex justify-between"><span>artifacts</span><span className="text-bone tabular">1.4 / 5 GB</span></div>
-            <div className="mt-1.5 h-1 w-full bg-rule">
-              <div className="h-full bg-lime" style={{ width: "28%" }} />
-            </div>
-            <div className="mt-3 flex justify-between"><span>seats</span><span className="text-bone tabular">3 / 14</span></div>
+        <div className="mt-8 rounded-md border border-line bg-surface p-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-medium text-ink">Storage</span>
+            <span className="text-[10px] text-ink-3">Open beta</span>
+          </div>
+          <div className="mt-3 flex items-baseline justify-between text-[11px]">
+            <span className="text-ink-3">Artifacts</span>
+            <span className="font-mono tabular text-ink">1.4 / 5.0 GB</span>
+          </div>
+          <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-line">
+            <div className="h-full rounded-full bg-accent" style={{ width: "28%" }} />
+          </div>
+          <div className="mt-3 flex items-baseline justify-between text-[11px]">
+            <span className="text-ink-3">Seats</span>
+            <span className="font-mono tabular text-ink">3 / 14</span>
           </div>
         </div>
       </nav>
 
-      {/* user footer */}
-      <div className="flex items-center justify-between gap-2 border-t border-rule p-3">
+      <div className="flex items-center justify-between gap-2 border-t border-line p-3">
         <div className="flex min-w-0 items-center gap-2">
-          <div className="grid h-7 w-7 place-items-center rounded-full bg-bone font-mono text-[10px] text-ink">
+          <div className="grid h-7 w-7 place-items-center rounded-full bg-ink text-[10px] font-semibold text-canvas">
             {CURRENT_USER.initials}
           </div>
           <div className="min-w-0">
-            <div className="truncate text-[12px] text-bone">{CURRENT_USER.name}</div>
-            <div className="truncate font-mono text-[10px] text-bone-faint">{CURRENT_USER.email}</div>
+            <div className="truncate text-[12px] font-medium text-ink">{CURRENT_USER.name}</div>
+            <div className="truncate text-[10px] text-ink-3">{CURRENT_USER.email}</div>
           </div>
         </div>
-        <button title="command palette" className="border border-rule px-1.5 py-1 hover:border-rule-2">
+        <button
+          type="button"
+          title="Command palette"
+          className="flex items-center gap-1 rounded-md border border-line bg-surface px-1.5 py-1 hover:border-line-strong"
+        >
           <Kbd>⌘K</Kbd>
         </button>
       </div>
     </aside>
+  );
+}
+
+function NavGroup({
+  label,
+  children,
+  className,
+}: { label: string; children: React.ReactNode; className?: string }) {
+  return (
+    <div className={className}>
+      <div className="px-2 pb-1.5 text-[10px] font-medium uppercase tracking-wider text-ink-3">{label}</div>
+      <ul className="space-y-0.5">{children}</ul>
+    </div>
+  );
+}
+
+function NavItem({
+  href,
+  label,
+  icon: Icon,
+}: { href: string; label: string; icon: React.ComponentType<{ className?: string; strokeWidth?: number }> }) {
+  return (
+    <li>
+      <Link
+        href={href}
+        className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-ink-2 hover:bg-surface hover:text-ink"
+      >
+        <Icon className="h-4 w-4 text-ink-3" strokeWidth={1.6} />
+        <span className="font-medium">{label}</span>
+      </Link>
+    </li>
   );
 }

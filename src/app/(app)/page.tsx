@@ -1,43 +1,53 @@
 import Link from "next/link";
+import { Plus, Search } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
 import { Sparkline } from "@/components/ui/sparkline";
 import { Pill } from "@/components/ui/pill";
-import { TickRule } from "@/components/ui/tick-rule";
 import { PROJECTS, CURRENT_ORG } from "@/lib/mock";
 import { relTime } from "@/lib/utils";
 
-// deterministic-per-project sparkline shape
 function projSpark(seed: string): number[] {
   const h = seed.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-  return Array.from({ length: 40 }, (_, i) => {
-    return 0.5 + Math.sin((i + h) / 5) * 0.25 + Math.cos((i + h) / 11) * 0.18;
-  });
+  return Array.from({ length: 40 }, (_, i) =>
+    0.5 + Math.sin((i + h) / 5) * 0.25 + Math.cos((i + h) / 11) * 0.18,
+  );
 }
 
 export default function DashboardPage() {
+  const totalRuns = PROJECTS.reduce((s, p) => s + p.runCount, 0);
+  const totalActive = PROJECTS.reduce((s, p) => s + p.activeCount, 0);
+
   return (
     <>
       <PageHeader
         crumbs={[{ href: "/", label: CURRENT_ORG.slug }]}
-        title={<>Projects</>}
+        title="Projects"
         meta={
           <>
             <span>{PROJECTS.length} projects</span>
-            <span>·</span>
-            <span>{PROJECTS.reduce((s, p) => s + p.runCount, 0)} runs</span>
-            <span>·</span>
+            <span className="text-line-strong">·</span>
+            <span>{totalRuns.toLocaleString()} runs</span>
+            <span className="text-line-strong">·</span>
             <span className="flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-lime blink" />
-              {PROJECTS.reduce((s, p) => s + p.activeCount, 0)} active
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-success" />
+              {totalActive} active now
             </span>
           </>
         }
         actions={
           <>
-            <button className="border border-rule px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-bone-dim hover:border-rule-2 hover:text-bone">
-              Filter
-            </button>
-            <button className="bg-lime px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-ink hover:bg-bone">
+            <div className="flex items-center gap-2 rounded-md border border-line bg-surface px-2.5 py-1.5 text-[12px] text-ink-3 focus-within:border-line-strong">
+              <Search className="h-3.5 w-3.5" />
+              <input
+                placeholder="Search projects…"
+                className="w-44 border-0 bg-transparent text-ink outline-0 placeholder:text-ink-3"
+              />
+            </div>
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 rounded-md bg-accent px-3 py-1.5 text-[12px] font-medium text-canvas hover:bg-accent-hover"
+            >
+              <Plus className="h-3.5 w-3.5" />
               New project
             </button>
           </>
@@ -45,71 +55,65 @@ export default function DashboardPage() {
       />
 
       <div className="p-8">
-        <div className="grid grid-cols-1 gap-px bg-rule md:grid-cols-2 xl:grid-cols-3">
-          {PROJECTS.map((p, i) => (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {PROJECTS.map((p) => (
             <Link
               key={p.id}
               href={`/p/${p.slug}`}
-              className="group relative flex flex-col gap-4 bg-ink p-5 transition-colors hover:bg-ink-2"
+              className="group flex flex-col gap-4 rounded-lg border border-line bg-surface p-5 transition hover:border-line-strong hover:shadow-[0_1px_0_var(--color-line-strong)]"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px] text-bone-faint">[{(i + 1).toString().padStart(2, "0")}]</span>
-                    <h3 className="truncate display text-[28px] leading-none text-bone group-hover:text-lime">
-                      {p.name}
-                    </h3>
-                  </div>
-                  <p className="mt-2 line-clamp-2 text-[13px] leading-snug text-bone-dim">
+                  <h3 className="truncate text-[17px] font-semibold tracking-tight text-ink group-hover:text-accent">
+                    {p.name}
+                  </h3>
+                  <p className="mt-1.5 line-clamp-2 text-[13px] leading-snug text-ink-2">
                     {p.description}
                   </p>
                 </div>
                 {p.activeCount > 0 && (
-                  <Pill tone="lime">
-                    <span className="h-1.5 w-1.5 rounded-full bg-lime blink" />
-                    {p.activeCount} live
+                  <Pill tone="success">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-success" />
+                    {p.activeCount}
                   </Pill>
                 )}
               </div>
 
-              <TickRule />
-
-              <div className="flex items-end justify-between gap-4">
-                <dl className="grid grid-cols-2 gap-x-6 gap-y-1 font-mono text-[10px]">
-                  <div>
-                    <dt className="text-bone-faint">runs</dt>
-                    <dd className="text-[14px] text-bone tabular">{p.runCount}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-bone-faint">framework</dt>
-                    <dd className="text-[12px] text-bone">{p.framework}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-bone-faint">updated</dt>
-                    <dd className="text-[12px] text-bone">{relTime(p.updated)}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-bone-faint">visibility</dt>
-                    <dd className="text-[12px] text-bone">private</dd>
-                  </div>
+              <div className="flex items-end justify-between gap-4 border-t border-line pt-4">
+                <dl className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-[12px]">
+                  <Stat label="Runs" value={p.runCount.toLocaleString()} />
+                  <Stat label="Framework" value={p.framework} />
+                  <Stat label="Updated" value={relTime(p.updated)} />
+                  <Stat label="Visibility" value="Private" />
                 </dl>
                 <Sparkline
                   data={projSpark(p.slug)}
-                  width={140}
-                  height={48}
-                  color={p.activeCount > 0 ? "var(--color-lime)" : "var(--color-bone-dim)"}
+                  width={120}
+                  height={42}
+                  color={p.activeCount > 0 ? "var(--color-success)" : "var(--color-ink-3)"}
                   fill
                 />
               </div>
             </Link>
           ))}
-          {/* "new project" tile */}
-          <div className="flex flex-col items-center justify-center gap-2 bg-ink p-5 text-bone-faint hover:bg-ink-2">
-            <span className="font-mono text-[32px] leading-none">+</span>
-            <span className="font-mono text-[11px] uppercase tracking-[0.16em]">new project</span>
-          </div>
+          <button
+            type="button"
+            className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-line-strong bg-transparent p-5 text-ink-3 transition hover:border-accent hover:text-accent"
+          >
+            <Plus className="h-5 w-5" />
+            <span className="text-[12px] font-medium">New project</span>
+          </button>
         </div>
       </div>
     </>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt className="text-ink-3">{label}</dt>
+      <dd className="text-ink">{value}</dd>
+    </div>
   );
 }

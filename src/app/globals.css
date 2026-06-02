@@ -1,144 +1,117 @@
 @import "tailwindcss";
 
 @theme {
-  /* ───────────── colors ───────────── */
-  --color-ink: oklch(0.11 0 0);              /* near-black canvas */
-  --color-ink-2: oklch(0.14 0 0);            /* slightly raised */
-  --color-ink-3: oklch(0.18 0 0);            /* surface */
-  --color-rule: oklch(0.24 0 0);             /* hairlines */
-  --color-rule-2: oklch(0.32 0 0);           /* stronger rule */
-  --color-bone: oklch(0.96 0.012 90);        /* warm off-white text */
-  --color-bone-dim: oklch(0.78 0.01 90);     /* secondary text */
-  --color-bone-faint: oklch(0.55 0.008 90);  /* tertiary / labels */
-  --color-lime: oklch(0.89 0.22 128);        /* acid lime accent */
-  --color-lime-dim: oklch(0.62 0.18 128);
-  --color-amber: oklch(0.82 0.16 75);        /* warn */
-  --color-rust: oklch(0.66 0.21 32);         /* fail */
-  --color-cyan: oklch(0.78 0.13 220);        /* info */
+  /* ───────────── surfaces ───────────── */
+  --color-canvas: oklch(0.987 0.004 90);          /* warm off-white page */
+  --color-surface: oklch(1 0 0);                  /* card / panel — pure white */
+  --color-surface-2: oklch(0.97 0.005 90);        /* sunken / striped row */
+  --color-surface-hover: oklch(0.955 0.006 90);   /* row/cell hover */
+
+  /* ───────────── lines ───────────── */
+  --color-line: oklch(0.91 0.006 90);             /* hairline rule */
+  --color-line-strong: oklch(0.85 0.006 90);      /* button + emphasised rule */
+
+  /* ───────────── text ───────────── */
+  --color-ink: oklch(0.24 0.012 264);             /* primary text — deep blue-grey */
+  --color-ink-2: oklch(0.46 0.012 264);           /* secondary */
+  --color-ink-3: oklch(0.62 0.010 264);           /* tertiary / labels */
+
+  /* ───────────── accent ───────────── */
+  --color-accent: oklch(0.46 0.12 262);           /* muted indigo */
+  --color-accent-hover: oklch(0.40 0.13 262);
+  --color-accent-soft: oklch(0.95 0.025 262);     /* tint for backgrounds */
+  --color-accent-ink: oklch(0.36 0.13 262);       /* text-on-soft */
+
+  /* ───────────── status (calm) ───────────── */
+  --color-success: oklch(0.58 0.10 152);          /* sage */
+  --color-success-soft: oklch(0.95 0.04 152);
+  --color-warn: oklch(0.66 0.13 70);              /* amber */
+  --color-warn-soft: oklch(0.95 0.05 70);
+  --color-fail: oklch(0.55 0.16 26);              /* clay */
+  --color-fail-soft: oklch(0.95 0.04 26);
+  --color-info: oklch(0.55 0.10 220);
+  --color-info-soft: oklch(0.95 0.03 220);
 
   /* ───────────── fonts ───────────── */
-  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
   /* ───────────── radii ───────────── */
-  --radius-xs: 1px;
-  --radius-sm: 2px;
-  --radius-md: 3px;
-  --radius-lg: 4px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
 }
 
 @layer base {
-  *, *::before, *::after { border-color: var(--color-rule); }
+  *, *::before, *::after { border-color: var(--color-line); }
 
   html {
-    background: var(--color-ink);
-    color: var(--color-bone);
+    background: var(--color-canvas);
+    color: var(--color-ink);
     font-family: var(--font-sans);
     font-feature-settings: "ss01", "cv11", "cv02";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
 
-  body {
-    background:
-      radial-gradient(ellipse 80% 50% at 50% -10%, oklch(0.18 0 0 / 0.6), transparent 70%),
-      var(--color-ink);
-    min-height: 100dvh;
-  }
+  body { min-height: 100dvh; }
 
-  /* tabular numerics for all data surfaces */
+  /* tabular numerics for data surfaces */
   .tabular, table, td, th { font-variant-numeric: tabular-nums slashed-zero; }
 
-  /* selection */
-  ::selection { background: var(--color-lime); color: var(--color-ink); }
+  ::selection { background: var(--color-accent-soft); color: var(--color-accent-ink); }
 
-  /* scrollbar */
   ::-webkit-scrollbar { width: 10px; height: 10px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--color-rule); border-radius: 0; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--color-rule-2); }
+  ::-webkit-scrollbar-thumb { background: var(--color-line); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-line-strong); }
 
-  /* focus rings — acid lime hairline */
-  :focus-visible { outline: 1px solid var(--color-lime); outline-offset: 2px; }
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: var(--radius-xs); }
 }
 
 /* ───────────── typography utilities ───────────── */
-@utility display {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  line-height: 0.95;
+
+/* Heavy sans heading — replaces the old italic-serif display. */
+@utility heading {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.018em;
+  line-height: 1.05;
+  color: var(--color-ink);
 }
 
+/* Sentence-case eyebrow — small uppercase mono label for section markers. */
 @utility eyebrow {
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-bone-faint);
+  color: var(--color-ink-3);
 }
 
+/* Small mono label (e.g. inside a stat tile). */
 @utility label-mono {
   font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.06em;
-  color: var(--color-bone-faint);
-}
-
-/* ───────────── decorative ───────────── */
-@utility grid-bg {
-  background-image:
-    linear-gradient(to right, var(--color-rule) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--color-rule) 1px, transparent 1px);
-  background-size: 96px 96px;
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black, transparent 80%);
-}
-
-@utility tick-rule {
-  background-image: repeating-linear-gradient(
-    to right,
-    var(--color-rule) 0 1px,
-    transparent 1px 8px
-  );
-  height: 1px;
-}
-
-/* Noise overlay — applied as a plain class, not a utility, since utilities
-   can't carry pseudo-selectors in Tailwind v4. */
-.noise { position: relative; }
-.noise::after {
-  content: "";
-  position: absolute; inset: 0;
-  pointer-events: none;
-  opacity: 0.04;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  letter-spacing: 0.02em;
+  color: var(--color-ink-3);
 }
 
 /* ───────────── motion ───────────── */
 @keyframes reveal {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-@keyframes blink {
-  0%, 60%   { opacity: 1; }
-  61%, 100% { opacity: 0.2; }
-}
-@keyframes scan {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(100%); }
-}
-@utility reveal { animation: reveal 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-@utility blink  { animation: blink 1.2s steps(1) infinite; }
+@utility reveal { animation: reveal 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 
-/* uPlot theme override */
-.uplot {
-  font-family: var(--font-mono) !important;
-  color: var(--color-bone-dim);
-}
-.uplot .u-axis { color: var(--color-bone-faint); font-size: 10px; }
-.uplot .u-legend { color: var(--color-bone); font-size: 11px; }
-.uplot .u-grid { stroke: var(--color-rule); }
+/* uPlot theme override (still loaded even if unused right now) */
+.uplot { font-family: var(--font-mono) !important; color: var(--color-ink-2); }
+.uplot .u-axis { color: var(--color-ink-3); font-size: 10px; }
+.uplot .u-legend { color: var(--color-ink); font-size: 11px; }
+.uplot .u-grid { stroke: var(--color-line); }
+
+/* Recharts text reads our ink tokens */
+.recharts-cartesian-axis-tick text,
+.recharts-text { fill: var(--color-ink-3) !important; }

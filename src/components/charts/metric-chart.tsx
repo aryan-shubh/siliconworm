@@ -70,18 +70,18 @@ export function MetricChart({
   const first = data[0] ?? 0;
   const delta = last - first;
   const pct = first ? (delta / Math.abs(first)) * 100 : 0;
-  const deltaCls = delta < 0 ? "text-lime" : delta > 0 ? "text-rust" : "text-bone-faint";
+  const deltaCls = delta < 0 ? "text-accent" : delta > 0 ? "text-fail" : "text-ink-3";
 
   return (
-    <div className="flex flex-col border border-rule bg-ink-2/40">
+    <div className="flex flex-col border border-line bg-surface/40">
       {!hideHeader && (
-        <div className="flex items-center justify-between border-b border-rule px-3 py-2">
+        <div className="flex items-center justify-between border-b border-line px-3 py-2">
           <div className="flex items-baseline gap-2">
-            <span className="font-mono text-[11px] text-bone">{label}</span>
-            {unit && <span className="font-mono text-[10px] text-bone-faint">{unit}</span>}
+            <span className="font-mono text-[11px] text-ink">{label}</span>
+            {unit && <span className="font-mono text-[10px] text-ink-3">{unit}</span>}
           </div>
           <div className="flex items-baseline gap-2 font-mono text-[11px] tabular">
-            <span className="text-bone">{fmt(last)}</span>
+            <span className="text-ink">{fmt(last)}</span>
             <span className={deltaCls}>
               {delta < 0 ? "↘" : delta > 0 ? "↗" : "→"} {Math.abs(pct).toFixed(1)}%
             </span>
@@ -98,25 +98,24 @@ export function MetricChart({
           className="h-full w-full"
         >
           <Grid
-            stroke="var(--color-rule)"
+            stroke="var(--color-line)"
             strokeDasharray="2 4"
             horizontal
             vertical={false}
           />
           <XAxis
             dataKey="step"
-            tick={{ fill: "var(--color-bone-faint)", fontSize: 10 }}
+            tick={{ fill: "var(--color-ink-3)", fontSize: 10 }}
             tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v))}
             minTickGap={32}
           />
           <YAxis
-            tick={{ fill: "var(--color-bone-faint)", fontSize: 10 }}
+            tick={{ fill: "var(--color-ink-3)", fontSize: 10 }}
             tickFormatter={fmt}
             width={44}
           />
           <Tooltip variant="default" />
-          <Line dataKey={dataKey} strokeVariant="solid" glowing>
-            <Dot variant="default" />
+          <Line dataKey={dataKey} strokeVariant="solid">
             <ActiveDot variant="default" />
           </Line>
         </EvilLineChart>
