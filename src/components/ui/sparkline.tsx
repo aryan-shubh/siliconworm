@@ -28,9 +28,20 @@ export function Sparkline({
   const path = `M${points.join(" L")}`;
   const area = fill ? `${path} L${width},${height} L0,${height} Z` : "";
   return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      className="overflow-visible"
+    >
       {fill && <path d={area} fill={color} opacity={0.12} />}
-      <path d={path} fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinejoin="round" />
+      <path
+        d={path}
+        fill="none"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }

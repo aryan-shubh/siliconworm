@@ -33,12 +33,12 @@ export function relTime(d: Date | string | number): string {
 
 const COLORS = [
   "oklch(0.89 0.22 128)", // lime
-  "oklch(0.82 0.16 75)",  // amber
+  "oklch(0.82 0.16 75)", // amber
   "oklch(0.78 0.13 220)", // cyan
-  "oklch(0.66 0.21 32)",  // rust
+  "oklch(0.66 0.21 32)", // rust
   "oklch(0.78 0.16 320)", // magenta
   "oklch(0.84 0.14 180)", // teal
-  "oklch(0.72 0.18 50)",  // tangerine
+  "oklch(0.72 0.18 50)", // tangerine
   "oklch(0.7  0.12 270)", // indigo
 ];
 export const seriesColor = (i: number) => COLORS[i % COLORS.length];

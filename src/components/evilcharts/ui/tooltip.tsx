@@ -1,5 +1,12 @@
-import { getPayloadConfigFromPayload, getColorsCount, useChart } from "@/components/evilcharts/ui/chart";
-import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
+import {
+  getPayloadConfigFromPayload,
+  getColorsCount,
+  useChart,
+} from "@/components/evilcharts/ui/chart";
+import type {
+  NameType,
+  ValueType,
+} from "recharts/types/component/DefaultTooltipContent";
 import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
 import * as React from "react";
@@ -60,11 +67,15 @@ function ChartTooltipContent({
     const key = `${labelKey ?? item?.dataKey ?? item?.name ?? "value"}`;
     const itemConfig = getPayloadConfigFromPayload(config, item, key);
     const value =
-      !labelKey && typeof label === "string" ? (config[label]?.label ?? label) : itemConfig?.label;
+      !labelKey && typeof label === "string"
+        ? (config[label]?.label ?? label)
+        : itemConfig?.label;
 
     if (labelFormatter) {
       return (
-        <div className={cn("font-medium", labelClassName)}>{labelFormatter(value, payload)}</div>
+        <div className={cn("font-medium", labelClassName)}>
+          {labelFormatter(value, payload)}
+        </div>
       );
     }
 
@@ -73,7 +84,15 @@ function ChartTooltipContent({
     }
 
     return <div className={cn("font-medium", labelClassName)}>{value}</div>;
-  }, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey]);
+  }, [
+    label,
+    labelFormatter,
+    payload,
+    hideLabel,
+    labelClassName,
+    config,
+    labelKey,
+  ]);
 
   if (!active || !payload?.length) {
     // Empty tooltip - to prevent position getting 0.0 so it doesnt animate tooltip every time from 0.0 origin
@@ -168,7 +187,10 @@ function ChartTooltipContent({
   );
 }
 
-function getIndicatorColorStyle(dataKey: string, colorsCount: number): React.CSSProperties {
+function getIndicatorColorStyle(
+  dataKey: string,
+  colorsCount: number,
+): React.CSSProperties {
   if (colorsCount <= 1) {
     return { background: `var(--color-${dataKey}-0)` };
   }

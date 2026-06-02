@@ -1,23 +1,31 @@
 import Link from "next/link";
 import {
-  LayoutGrid, FlaskConical, Database, GitBranch, Bell, Settings,
-  KeyRound, Users, BookOpen, ChevronsUpDown,
+  LayoutGrid,
+  FlaskConical,
+  Database,
+  GitBranch,
+  Bell,
+  Settings,
+  KeyRound,
+  Users,
+  BookOpen,
+  ChevronsUpDown,
 } from "lucide-react";
 import { Brand } from "@/components/brand";
 import { Kbd } from "@/components/ui/kbd";
 import { CURRENT_ORG, CURRENT_USER } from "@/lib/mock";
 
 const PRIMARY = [
-  { href: "/",          label: "Projects",  icon: LayoutGrid },
-  { href: "/runs",      label: "All runs",  icon: FlaskConical },
+  { href: "/", label: "Projects", icon: LayoutGrid },
+  { href: "/runs", label: "All runs", icon: FlaskConical },
   { href: "/artifacts", label: "Artifacts", icon: Database },
-  { href: "/sweeps",    label: "Sweeps",    icon: GitBranch },
-  { href: "/alerts",    label: "Alerts",    icon: Bell },
+  { href: "/sweeps", label: "Sweeps", icon: GitBranch },
+  { href: "/alerts", label: "Alerts", icon: Bell },
 ];
 const SECONDARY = [
-  { href: "/team",     label: "Team",     icon: Users },
-  { href: "/keys",     label: "API keys", icon: KeyRound },
-  { href: "/docs",     label: "Docs",     icon: BookOpen },
+  { href: "/team", label: "Team", icon: Users },
+  { href: "/keys", label: "API keys", icon: KeyRound },
+  { href: "/docs", label: "Docs", icon: BookOpen },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -37,8 +45,12 @@ export function Sidebar() {
               AL
             </span>
             <span className="min-w-0">
-              <span className="block truncate text-[12px] font-medium text-ink">{CURRENT_ORG.name}</span>
-              <span className="block truncate text-[10px] text-ink-3">Team · 14 seats</span>
+              <span className="block truncate text-[12px] font-medium text-ink">
+                {CURRENT_ORG.name}
+              </span>
+              <span className="block truncate text-[10px] text-ink-3">
+                Team · 14 seats
+              </span>
             </span>
           </span>
           <ChevronsUpDown className="h-3.5 w-3.5 text-ink-3" />
@@ -47,10 +59,14 @@ export function Sidebar() {
 
       <nav className="flex-1 overflow-y-auto px-2 py-3 text-[13px]">
         <NavGroup label="Workspace">
-          {PRIMARY.map((it) => <NavItem key={it.href} {...it} />)}
+          {PRIMARY.map((it) => (
+            <NavItem key={it.href} {...it} />
+          ))}
         </NavGroup>
         <NavGroup label="Account" className="mt-6">
-          {SECONDARY.map((it) => <NavItem key={it.href} {...it} />)}
+          {SECONDARY.map((it) => (
+            <NavItem key={it.href} {...it} />
+          ))}
         </NavGroup>
 
         <div className="mt-8 rounded-md border border-line bg-surface p-3">
@@ -63,7 +79,10 @@ export function Sidebar() {
             <span className="font-mono tabular text-ink">1.4 / 5.0 GB</span>
           </div>
           <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-line">
-            <div className="h-full rounded-full bg-accent" style={{ width: "28%" }} />
+            <div
+              className="h-full rounded-full bg-accent"
+              style={{ width: "28%" }}
+            />
           </div>
           <div className="mt-3 flex items-baseline justify-between text-[11px]">
             <span className="text-ink-3">Seats</span>
@@ -78,8 +97,12 @@ export function Sidebar() {
             {CURRENT_USER.initials}
           </div>
           <div className="min-w-0">
-            <div className="truncate text-[12px] font-medium text-ink">{CURRENT_USER.name}</div>
-            <div className="truncate text-[10px] text-ink-3">{CURRENT_USER.email}</div>
+            <div className="truncate text-[12px] font-medium text-ink">
+              {CURRENT_USER.name}
+            </div>
+            <div className="truncate text-[10px] text-ink-3">
+              {CURRENT_USER.email}
+            </div>
           </div>
         </div>
         <button
@@ -98,10 +121,16 @@ function NavGroup({
   label,
   children,
   className,
-}: { label: string; children: React.ReactNode; className?: string }) {
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div className={className}>
-      <div className="px-2 pb-1.5 text-[10px] font-medium uppercase tracking-wider text-ink-3">{label}</div>
+      <div className="px-2 pb-1.5 text-[10px] font-medium uppercase tracking-wider text-ink-3">
+        {label}
+      </div>
       <ul className="space-y-0.5">{children}</ul>
     </div>
   );
@@ -111,7 +140,11 @@ function NavItem({
   href,
   label,
   icon: Icon,
-}: { href: string; label: string; icon: React.ComponentType<{ className?: string; strokeWidth?: number }> }) {
+}: {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+}) {
   return (
     <li>
       <Link

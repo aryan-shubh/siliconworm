@@ -8,8 +8,10 @@ import { relTime } from "@/lib/utils";
 
 function projSpark(seed: string): number[] {
   const h = seed.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-  return Array.from({ length: 40 }, (_, i) =>
-    0.5 + Math.sin((i + h) / 5) * 0.25 + Math.cos((i + h) / 11) * 0.18,
+  return Array.from(
+    { length: 40 },
+    (_, i) =>
+      0.5 + Math.sin((i + h) / 5) * 0.25 + Math.cos((i + h) / 11) * 0.18,
   );
 }
 
@@ -90,7 +92,11 @@ export default function DashboardPage() {
                   data={projSpark(p.slug)}
                   width={120}
                   height={42}
-                  color={p.activeCount > 0 ? "var(--color-success)" : "var(--color-ink-3)"}
+                  color={
+                    p.activeCount > 0
+                      ? "var(--color-success)"
+                      : "var(--color-ink-3)"
+                  }
                   fill
                 />
               </div>

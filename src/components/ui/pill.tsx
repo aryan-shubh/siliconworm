@@ -11,11 +11,11 @@ export function Pill({
 }) {
   const tones: Record<string, string> = {
     neutral: "border-line bg-surface-2 text-ink-2",
-    accent:  "border-accent/30 bg-accent-soft text-accent-ink",
+    accent: "border-accent/30 bg-accent-soft text-accent-ink",
     success: "border-success/30 bg-success-soft text-success",
-    warn:    "border-warn/30 bg-warn-soft text-warn",
-    fail:    "border-fail/30 bg-fail-soft text-fail",
-    info:    "border-info/30 bg-info-soft text-info",
+    warn: "border-warn/30 bg-warn-soft text-warn",
+    fail: "border-fail/30 bg-fail-soft text-fail",
+    info: "border-info/30 bg-info-soft text-info",
   };
   return (
     <span

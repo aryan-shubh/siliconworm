@@ -7,8 +7,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "biome check .",
-    "format": "biome format --write .",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "check": "oxlint && oxfmt --check",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push"
   },
@@ -52,6 +53,7 @@
     "@tailwindcss/postcss": "^4.0.0",
     "postcss": "^8.5.1",
     "drizzle-kit": "^0.30.2",
-    "@biomejs/biome": "^1.9.4"
+    "oxlint": "^1.27.0",
+    "oxfmt": "^0.5.0"
   }
 }

@@ -22,8 +22,16 @@ import {
   type TooltipRoundness,
   type TooltipVariant,
 } from "@/components/evilcharts/ui/tooltip";
-import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/components/evilcharts/ui/evil-brush";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/components/evilcharts/ui/legend";
+import {
+  EvilBrush,
+  useEvilBrush,
+  type EvilBrushRange,
+} from "@/components/evilcharts/ui/evil-brush";
+import {
+  ChartLegend,
+  ChartLegendContent,
+  type ChartLegendVariant,
+} from "@/components/evilcharts/ui/legend";
 import { ChartDot, type DotVariant } from "@/components/evilcharts/ui/dot";
 import {
   Children,
@@ -63,7 +71,12 @@ type StrokeVariant = "solid" | "dashed" | "animated-dashed";
  * static chart. `"none"` opts out entirely; it is also what a device with the
  * OS "reduce motion" preference falls back to automatically.
  */
-type LineAnimationType = "none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in";
+type LineAnimationType =
+  | "none"
+  | "left-to-right"
+  | "right-to-left"
+  | "center-out"
+  | "edges-in";
 type RevealAnimationType = Exclude<LineAnimationType, "none">;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -126,7 +139,10 @@ type EvilLineChartBaseProps<
   showBrush?: boolean; // renders a zoom brush below the chart
   xDataKey?: keyof TData & string; // x-axis key — only needed for the brush footer
   brushHeight?: number; // height of the brush preview in pixels
-  brushFormatLabel?: (value: unknown, index: number) => string; // formats brush axis labels
+  brushFormatLabel?: (
+    value: unknown,
+    index: number,
+  ) => string; // formats brush axis labels
   onBrushChange?: (range: EvilBrushRange) => void; // fires when the brush range changes
 };
 
@@ -163,8 +179,13 @@ export function EvilLineChart<
   onBrushChange,
 }: EvilLineChartProps<TData, TConfig>) {
   const chartId = useId().replace(/:/g, ""); // colon-free id keeps CSS/SVG selectors valid
-  const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
-  const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingPoints);
+  const [selectedDataKey, setSelectedDataKey] = useState<string | null>(
+    defaultSelectedDataKey,
+  );
+  const { loadingData, onShimmerExit } = useLoadingData(
+    isLoading,
+    loadingPoints,
+  );
   const { visibleData, brushProps } = useEvilBrush({ data });
 
   const displayData = showBrush && !isLoading ? visibleData : data;
@@ -187,7 +208,14 @@ export function EvilLineChart<
       selectedDataKey,
       selectDataKey,
     }),
-    [config, curveType, animationType, isLoading, selectedDataKey, selectDataKey],
+    [
+      config,
+      curveType,
+      animationType,
+      isLoading,
+      selectedDataKey,
+      selectDataKey,
+    ],
   );
 
   return (
@@ -225,7 +253,13 @@ export function EvilLineChart<
           {...chartProps}
         >
           {children}
-          {isLoading && <LoadingLine chartId={chartId} curveType={curveType} onShimmerExit={onShimmerExit} />}
+          {isLoading && (
+            <LoadingLine
+              chartId={chartId}
+              curveType={curveType}
+              onShimmerExit={onShimmerExit}
+            />
+          )}
         </RechartsLineChart>
       </ChartContainer>
     </LineChartContext>
@@ -296,7 +330,13 @@ export function Line({
   const hasSelection = selectedDataKey !== null;
   const opacity = getOpacity(selectedDataKey, dataKey);
 
-  const { dot, activeDot } = resolveDots(children, id, dataKey, opacity.dot, maskId);
+  const { dot, activeDot } = resolveDots(
+    children,
+    id,
+    dataKey,
+    opacity.dot,
+    maskId,
+  );
 
   const isAnimatedDashed = strokeVariant === "animated-dashed";
   const isDashed = strokeVariant === "dashed" || isAnimatedDashed;
@@ -442,8 +482,18 @@ type GridProps = ComponentProps<typeof CartesianGrid>;
  * The background grid lines. Defaults to horizontal-only dashed lines and
  * forwards every Recharts CartesianGrid prop for full control.
  */
-export function Grid({ vertical = false, strokeDasharray = "3 3", ...props }: GridProps) {
-  return <CartesianGrid vertical={vertical} strokeDasharray={strokeDasharray} {...props} />;
+export function Grid({
+  vertical = false,
+  strokeDasharray = "3 3",
+  ...props
+}: GridProps) {
+  return (
+    <CartesianGrid
+      vertical={vertical}
+      strokeDasharray={strokeDasharray}
+      {...props}
+    />
+  );
 }
 
 type TooltipProps = {
@@ -457,7 +507,12 @@ type TooltipProps = {
  * The hover tooltip. Reads the chart's selection from context so its content
  * dims unselected series. Hidden automatically while the chart is loading.
  */
-export function Tooltip({ variant, roundness, defaultIndex, cursor = true }: TooltipProps) {
+export function Tooltip({
+  variant,
+  roundness,
+  defaultIndex,
+  cursor = true,
+}: TooltipProps) {
   const { isLoading, selectedDataKey } = useLineChart();
 
   if (isLoading) return null;
@@ -465,9 +520,15 @@ export function Tooltip({ variant, roundness, defaultIndex, cursor = true }: Too
   return (
     <ChartTooltip
       defaultIndex={defaultIndex}
-      cursor={cursor ? { strokeDasharray: "3 3", strokeWidth: STROKE_WIDTH } : false}
+      cursor={
+        cursor ? { strokeDasharray: "3 3", strokeWidth: STROKE_WIDTH } : false
+      }
       content={
-        <ChartTooltipContent selected={selectedDataKey} roundness={roundness} variant={variant} />
+        <ChartTooltipContent
+          selected={selectedDataKey}
+          roundness={roundness}
+          variant={variant}
+        />
       }
     />
   );
@@ -518,7 +579,9 @@ const getOpacity = (selectedDataKey: string | null, dataKey: string) => {
     return { stroke: 1, dot: 1 };
   }
 
-  return selectedDataKey === dataKey ? { stroke: 1, dot: 1 } : { stroke: 0.3, dot: 0.3 };
+  return selectedDataKey === dataKey
+    ? { stroke: 1, dot: 1 }
+    : { stroke: 0.3, dot: 0.3 };
 };
 
 // Resolves a line's stroke-dasharray — the buffer line manages its own dashes
@@ -561,7 +624,12 @@ const resolveDots = (
     if (child.type === ActiveDot) {
       const { variant } = (child as ReactElement<DotProps>).props;
       activeDot = (
-        <ChartDot type={variant} dataKey={dataKey} chartId={id} fillOpacity={dotOpacity} />
+        <ChartDot
+          type={variant}
+          dataKey={dataKey}
+          chartId={id}
+          fillOpacity={dotOpacity}
+        />
       );
     }
   });
@@ -580,7 +648,9 @@ const resolveDots = (
 type CurvePoint = NonNullable<NonNullable<CurveProps["points"]>[number]>;
 type DrawableCurvePoint = CurvePoint & { x: number; y: number };
 
-const isDrawableCurvePoint = (point: CurvePoint): point is DrawableCurvePoint => {
+const isDrawableCurvePoint = (
+  point: CurvePoint,
+): point is DrawableCurvePoint => {
   return typeof point.x === "number" && typeof point.y === "number";
 };
 
@@ -589,7 +659,11 @@ const BUFFER_GAP_SIZE = 3;
 
 // Binary-search the path to find the length at which path.x ≈ targetX,
 // using the browser's native getPointAtLength for exact curve measurement.
-const findLengthAtX = (path: SVGPathElement, totalLength: number, targetX: number): number => {
+const findLengthAtX = (
+  path: SVGPathElement,
+  totalLength: number,
+  targetX: number,
+): number => {
   let lo = 0;
   let hi = totalLength;
   // ~0.5px precision is more than enough for a dasharray split
@@ -630,7 +704,8 @@ const bufferLineShape = (props: CurveProps) => {
     const lastSegmentLength = totalLength - solidLength;
 
     // Build dasharray: solid run, then repeating dash-gap for the buffer segment
-    const reps = Math.ceil(lastSegmentLength / (BUFFER_DASH_SIZE + BUFFER_GAP_SIZE)) + 1;
+    const reps =
+      Math.ceil(lastSegmentLength / (BUFFER_DASH_SIZE + BUFFER_GAP_SIZE)) + 1;
     const dashedPart = Array.from(
       { length: reps },
       () => `${BUFFER_DASH_SIZE} ${BUFFER_GAP_SIZE}`,
@@ -679,7 +754,10 @@ const AnimatedDashedStroke = () => {
 
 // motion `originX` for each single-rect reveal — the edge the wipe grows from.
 // 0 = left edge, 1 = right edge, 0.5 = centre (grows outward to both edges).
-const SINGLE_REVEAL_ORIGIN: Record<Exclude<RevealAnimationType, "edges-in">, number> = {
+const SINGLE_REVEAL_ORIGIN: Record<
+  Exclude<RevealAnimationType, "edges-in">,
+  number
+> = {
   "left-to-right": 0,
   "right-to-left": 1,
   "center-out": 0.5,
@@ -697,7 +775,13 @@ const SINGLE_REVEAL_ORIGIN: Record<Exclude<RevealAnimationType, "edges-in">, num
  * Each rect animates `scaleX` 0 → 1; `originX` decides which edge it grows from.
  * "edges-in" needs two rects — each half grows inward from an opposite edge.
  */
-const RevealMask = ({ id, type }: { id: string; type: RevealAnimationType }) => {
+const RevealMask = ({
+  id,
+  type,
+}: {
+  id: string;
+  type: RevealAnimationType;
+}) => {
   const reveal = {
     initial: { scaleX: 0 },
     animate: { scaleX: 1 },
@@ -756,7 +840,11 @@ const RevealMask = ({ id, type }: { id: string; type: RevealAnimationType }) => 
  * Horizontal left-to-right color gradient for a series. Always rendered — the
  * line's stroke and its dots all paint from this single gradient.
  */
-const ColorGradient = ({ id, dataKey, config }: StyleProps & { config: ChartConfig }) => {
+const ColorGradient = ({
+  id,
+  dataKey,
+  config,
+}: StyleProps & { config: ChartConfig }) => {
   const colorsCount = getColorsCount(config[dataKey] ?? {});
 
   return (
@@ -785,7 +873,13 @@ const ColorGradient = ({ id, dataKey, config }: StyleProps & { config: ChartConf
 /** Soft outer glow filter applied to a glowing line. */
 const GlowFilter = ({ id, dataKey }: StyleProps) => {
   return (
-    <filter id={`${id}-glow-${dataKey}`} x="-50%" y="-50%" width="200%" height="200%">
+    <filter
+      id={`${id}-glow-${dataKey}`}
+      x="-50%"
+      y="-50%"
+      width="200%"
+      height="200%"
+    >
       <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
       <feColorMatrix
         in="blur"
@@ -819,7 +913,10 @@ const generateEasedGradientStops = (
     // Sine-based bell curve easing: peaks at center (t=0.5), smooth falloff at edges
     const eased = Math.sin(t * Math.PI) ** 2;
     const opacity = minOpacity + eased * (maxOpacity - minOpacity);
-    return { offset: `${(t * 100).toFixed(0)}%`, opacity: Number(opacity.toFixed(3)) };
+    return {
+      offset: `${(t * 100).toFixed(0)}%`,
+      opacity: Number(opacity.toFixed(3)),
+    };
   });
 };
 
@@ -914,9 +1011,20 @@ const LoadingPattern = ({
 
   return (
     <>
-      <linearGradient id={`${chartId}-loading-gradient`} x1="0" y1="0" x2="1" y2="0">
+      <linearGradient
+        id={`${chartId}-loading-gradient`}
+        x1="0"
+        y1="0"
+        x2="1"
+        y2="0"
+      >
         {gradientStops.map(({ offset, opacity }) => (
-          <stop key={offset} offset={offset} stopColor="white" stopOpacity={opacity} />
+          <stop
+            key={offset}
+            offset={offset}
+            stopColor="white"
+            stopOpacity={opacity}
+          />
         ))}
       </linearGradient>
       <pattern
@@ -956,7 +1064,11 @@ const LoadingPattern = ({
         />
       </pattern>
       <mask id={`${chartId}-loading-mask`} maskUnits="userSpaceOnUse">
-        <rect width="100%" height="100%" fill={`url(#${chartId}-loading-pattern)`} />
+        <rect
+          width="100%"
+          height="100%"
+          fill={`url(#${chartId}-loading-pattern)`}
+        />
       </mask>
     </>
   );

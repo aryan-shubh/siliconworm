@@ -1,4 +1,7 @@
-import { drizzle, type PlanetScaleDatabase } from "drizzle-orm/planetscale-serverless";
+import {
+  drizzle,
+  type PlanetScaleDatabase,
+} from "drizzle-orm/planetscale-serverless";
 import { Client } from "@planetscale/database";
 import * as schema from "./schema";
 
