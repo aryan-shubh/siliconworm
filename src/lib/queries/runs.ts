@@ -1,4 +1,4 @@
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { getDb } from "../db";
 import { runs, runMetrics, projects } from "../schema";
 
@@ -51,6 +51,41 @@ async function metricsForRun(
   return METRIC_NAMES.map((name) => ({ name, data: byName.get(name) ?? [] }));
 }
 
+async function metricsForRuns(
+  runIds: string[],
+): Promise<Map<string, { name: string; data: number[] }[]>> {
+  const out = new Map<string, { name: string; data: number[] }[]>();
+  if (runIds.length === 0) return out;
+  const db = getDb();
+  const rows = await db
+    .select({
+      runId: runMetrics.runId,
+      name: runMetrics.name,
+      step: runMetrics.step,
+      value: runMetrics.value,
+    })
+    .from(runMetrics)
+    .where(inArray(runMetrics.runId, runIds))
+    .orderBy(asc(runMetrics.runId), asc(runMetrics.name), asc(runMetrics.step));
+
+  // Pre-seed each run with the full METRIC_NAMES skeleton.
+  for (const id of runIds) {
+    out.set(id, METRIC_NAMES.map((name) => ({ name, data: [] as number[] })));
+  }
+  // Group by runId+name, preserving step order from ORDER BY.
+  for (const r of rows) {
+    const series = out.get(r.runId);
+    if (!series) continue;
+    let bucket = series.find((s) => s.name === r.name);
+    if (!bucket) {
+      bucket = { name: r.name, data: [] };
+      series.push(bucket);
+    }
+    bucket.data.push(r.value);
+  }
+  return out;
+}
+
 async function projectIdForSlug(slug: string): Promise<string | null> {
   const db = getDb();
   const [row] = await db
@@ -75,24 +110,24 @@ export async function listRunsForProject(
     .orderBy(desc(runs.startedAt))
     .limit(limit);
 
-  return Promise.all(
-    rows.map(async (r) => ({
-      id: r.id,
-      projectSlug,
-      name: r.displayName,
-      user: "aryan",
-      status: r.status,
-      group: r.group,
-      startedAt: r.startedAt.toISOString(),
-      durationS: (r.durationMs ?? 0) / 1000,
-      tags: r.tags,
-      config: r.config as Run["config"],
-      summary: r.summary as Run["summary"],
-      metrics: await metricsForRun(r.id),
-      arch: (r.systemInfo as { arch?: string }).arch ?? "—",
-      gpu: (r.systemInfo as { gpu?: string }).gpu ?? "—",
-    })),
-  );
+  const metricsMap = await metricsForRuns(rows.map((r) => r.id));
+
+  return rows.map((r) => ({
+    id: r.id,
+    projectSlug,
+    name: r.displayName,
+    user: "aryan",
+    status: r.status,
+    group: r.group,
+    startedAt: r.startedAt.toISOString(),
+    durationS: (r.durationMs ?? 0) / 1000,
+    tags: r.tags,
+    config: r.config as Run["config"],
+    summary: r.summary as Run["summary"],
+    metrics: metricsMap.get(r.id) ?? METRIC_NAMES.map((name) => ({ name, data: [] })),
+    arch: (r.systemInfo as { arch?: string }).arch ?? "—",
+    gpu: (r.systemInfo as { gpu?: string }).gpu ?? "—",
+  }));
 }
 
 export async function getRunById(
