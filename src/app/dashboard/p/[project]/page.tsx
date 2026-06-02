@@ -38,7 +38,9 @@ export default async function ProjectPage({
   const failedCount = runs.filter(
     (r) => r.status === "failed" || r.status === "crashed",
   ).length;
-  const bestVal = Math.min(...runs.map((r) => r.summary.val_loss));
+  const bestVal = runs.length
+    ? Math.min(...runs.map((r) => r.summary.val_loss))
+    : null;
 
   return (
     <>
@@ -98,7 +100,7 @@ export default async function ProjectPage({
           />
           <StatCard
             label="Best val_loss"
-            value={bestVal.toFixed(3)}
+            value={bestVal === null ? "—" : bestVal.toFixed(3)}
             sublabel="↘ from 0.61"
             tone="success"
           />
