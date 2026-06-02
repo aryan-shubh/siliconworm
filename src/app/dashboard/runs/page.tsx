@@ -9,7 +9,6 @@ import {
 import { PageHeader } from "@/components/app/page-header";
 import { Sparkline } from "@/components/ui/sparkline";
 import { StatusDot } from "@/components/ui/status-dot";
-import { Pill } from "@/components/ui/pill";
 import {
   ACME_DEMO_ORG_ID,
   getCurrentOrg,
@@ -17,7 +16,7 @@ import {
   listRunsForProject,
   type Run,
 } from "@/lib/queries";
-import { formatDuration, formatNum, projectName, relTime } from "@/lib/utils";
+import { formatDuration, projectName, relTime } from "@/lib/utils";
 
 export default async function AllRunsPage() {
   const [org, projects] = await Promise.all([
