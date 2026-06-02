@@ -48,7 +48,7 @@ export async function listProjects(orgId: string): Promise<Project[]> {
     const activeCount = allRuns.filter((r) => r.status === "running").length;
     const latest = allRuns
       .map((r) => r.startedAt)
-      .sort((a, b) => +b - +a)[0];
+      .toSorted((a, b) => +b - +a)[0];
     result.push({
       id: p.id,
       slug: p.slug,
@@ -88,7 +88,7 @@ export async function getProjectBySlug(
     runCount: all.length,
     activeCount: all.filter((r) => r.status === "running").length,
     updated: (
-      all.map((r) => r.startedAt).sort((a, b) => +b - +a)[0] ?? new Date()
+      all.map((r) => r.startedAt).toSorted((a, b) => +b - +a)[0] ?? new Date()
     ).toISOString(),
   };
 }
