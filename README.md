@@ -42,29 +42,28 @@ Open <http://localhost:3000>. The landing renders at `/`; the dashboard is at `/
 | `/p/[project]`                | Runs table for one project · overlay chart of all runs · filter bar                           |
 | `/p/[project]/runs/[runId]`   | Single-run detail: 5 metric tiles, 6 glowing charts, config + system + live log, artifacts    |
 
-Right now every page reads from `src/lib/mock.ts` — deterministic seeded fake runs. No database call happens at request time.
+Pages read from `src/lib/queries/*` which is backed by PlanetScale (via Drizzle). Seed the demo state with `bun run db:seed`.
 
 ## Project layout
 
 ```
 src/
 ├─ app/
-│  ├─ (app)/             # authed shell (sidebar layout)
-│  │  ├─ page.tsx        # projects grid (the new root)
-│  │  └─ p/[project]/
-│  │     ├─ page.tsx     # runs table
-│  │     └─ runs/[runId]/page.tsx
-│  ├─ globals.css        # Tailwind v4 @theme + custom utilities
+│  ├─ (marketing)/       # landing at /
+│  ├─ dashboard/         # authed product shell + routes
+│  ├─ globals.css
 │  └─ layout.tsx
 ├─ components/
 │  ├─ app/               # sidebar, page header
 │  ├─ charts/            # MetricChart (EvilCharts wrapper)
 │  ├─ evilcharts/        # generated from the EvilCharts registry
+│  ├─ marketing/         # landing components
 │  └─ ui/                # sparkline, pill, kbd, status-dot, tick-rule
 └─ lib/
-   ├─ schema.ts          # Drizzle schema (users, orgs, projects, runs, artifacts)
-   ├─ db.ts              # PlanetScale serverless client (unused for now)
-   ├─ mock.ts            # deterministic mock data
+   ├─ schema.ts          # Drizzle schema (users, orgs, projects, runs, run_metrics, artifacts)
+   ├─ db.ts              # PlanetScale serverless client
+   ├─ queries/           # query functions used by RSC pages
+   ├─ demo-ids.ts        # shared demo constants
    └─ utils.ts
 ```
 
@@ -73,7 +72,7 @@ src/
 | Phase | Scope                                                     | State     |
 | ----- | --------------------------------------------------------- | --------- |
 | 1     | UI scaffold · dashboard · runs · run detail · mock data   | ✅ done   |
-| 2     | Python SDK · PlanetScale · ClickHouse · Kinesis · S3      | not started |
+| 2     | Python SDK · PlanetScale · ClickHouse · Kinesis · S3      | PlanetScale done · ClickHouse/Kinesis/S3 not started |
 | 3     | Sweeps · artifact CAS · Qdrant + RAG · self-host (SST)    | not started |
 
 ## Scripts
