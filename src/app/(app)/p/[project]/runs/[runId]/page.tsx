@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/app/page-header";
-import { BigChart } from "@/components/charts/big-chart";
+import { MetricChart } from "@/components/charts/metric-chart";
 import { StatusDot } from "@/components/ui/status-dot";
 import { Pill } from "@/components/ui/pill";
 import { TickRule } from "@/components/ui/tick-rule";
@@ -106,12 +106,49 @@ export default async function RunPage({
 
         {/* charts grid */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <BigChart data={m("train_loss")} label="train_loss" color="var(--color-lime)" baseline={0.5} />
-          <BigChart data={m("val_loss")} label="val_loss" color="var(--color-cyan)" />
-          <BigChart data={m("accuracy")} label="accuracy" color="var(--color-bone)" yFormat={(v) => `${(v * 100).toFixed(1)}%`} />
-          <BigChart data={m("grad_norm")} label="grad_norm" color="var(--color-amber)" />
-          <BigChart data={m("lr")} label="lr" color="var(--color-bone-dim)" yFormat={(v) => v.toExponential(1)} />
-          <BigChart data={m("gpu_util")} label="gpu_util" unit="%" color="var(--color-lime-dim)" yFormat={(v) => v.toFixed(0)} />
+          <MetricChart
+            data={m("train_loss")}
+            label="train_loss"
+            dataKey="train_loss"
+            gradient={["oklch(0.62 0.18 128)", "oklch(0.92 0.22 128)"]}
+            format="decimal"
+          />
+          <MetricChart
+            data={m("val_loss")}
+            label="val_loss"
+            dataKey="val_loss"
+            gradient={["oklch(0.50 0.13 220)", "oklch(0.82 0.13 220)"]}
+            format="decimal"
+          />
+          <MetricChart
+            data={m("accuracy")}
+            label="accuracy"
+            dataKey="accuracy"
+            gradient={["oklch(0.65 0.01 90)", "oklch(0.96 0.012 90)"]}
+            format="percent"
+          />
+          <MetricChart
+            data={m("grad_norm")}
+            label="grad_norm"
+            dataKey="grad_norm"
+            gradient={["oklch(0.55 0.16 75)", "oklch(0.86 0.16 75)"]}
+            format="decimal"
+          />
+          <MetricChart
+            data={m("lr")}
+            label="lr"
+            dataKey="lr"
+            gradient={["oklch(0.40 0.01 90)", "oklch(0.78 0.01 90)"]}
+            format="scientific"
+          />
+          <MetricChart
+            data={m("gpu_util")}
+            label="gpu_util"
+            unit="%"
+            dataKey="gpu_util"
+            gradient={["oklch(0.55 0.16 128)", "oklch(0.89 0.22 128)"]}
+            format="integer"
+          />
         </div>
 
         {/* config + system + logs */}
