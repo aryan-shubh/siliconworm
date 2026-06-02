@@ -13,27 +13,28 @@ import {
 } from "lucide-react";
 import { Brand } from "@/components/brand";
 import { Kbd } from "@/components/ui/kbd";
-import { CURRENT_ORG, CURRENT_USER } from "@/lib/mock";
+import { getCurrentOrg, getCurrentUser } from "@/lib/queries";
 
 const PRIMARY = [
-  { href: "/", label: "Projects", icon: LayoutGrid },
-  { href: "/runs", label: "All runs", icon: FlaskConical },
-  { href: "/artifacts", label: "Artifacts", icon: Database },
-  { href: "/sweeps", label: "Sweeps", icon: GitBranch },
-  { href: "/alerts", label: "Alerts", icon: Bell },
+  { href: "/dashboard", label: "Projects", icon: LayoutGrid },
+  { href: "/dashboard/runs", label: "All runs", icon: FlaskConical },
+  { href: "/dashboard/artifacts", label: "Artifacts", icon: Database },
+  { href: "/dashboard/sweeps", label: "Sweeps", icon: GitBranch },
+  { href: "/dashboard/alerts", label: "Alerts", icon: Bell },
 ];
 const SECONDARY = [
-  { href: "/team", label: "Team", icon: Users },
-  { href: "/keys", label: "API keys", icon: KeyRound },
-  { href: "/docs", label: "Docs", icon: BookOpen },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard/team", label: "Team", icon: Users },
+  { href: "/dashboard/keys", label: "API keys", icon: KeyRound },
+  { href: "/dashboard/docs", label: "Docs", icon: BookOpen },
+  { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
-export function Sidebar() {
+export async function Sidebar() {
+  const [org, user] = await Promise.all([getCurrentOrg(), getCurrentUser()]);
   return (
     <aside className="sticky top-0 flex h-dvh w-[240px] shrink-0 flex-col border-r border-line bg-surface-2/60">
       <div className="border-b border-line p-3">
-        <Link href="/" className="block px-1 py-1">
+        <Link href="/dashboard" className="block px-1 py-1">
           <Brand />
         </Link>
         <button
@@ -46,7 +47,7 @@ export function Sidebar() {
             </span>
             <span className="min-w-0">
               <span className="block truncate text-[12px] font-medium text-ink">
-                {CURRENT_ORG.name}
+                {org.name}
               </span>
               <span className="block truncate text-[10px] text-ink-3">
                 Team · 14 seats
@@ -94,14 +95,14 @@ export function Sidebar() {
       <div className="flex items-center justify-between gap-2 border-t border-line p-3">
         <div className="flex min-w-0 items-center gap-2">
           <div className="grid h-7 w-7 place-items-center rounded-full bg-ink text-[10px] font-semibold text-canvas">
-            {CURRENT_USER.initials}
+            {user.initials}
           </div>
           <div className="min-w-0">
             <div className="truncate text-[12px] font-medium text-ink">
-              {CURRENT_USER.name}
+              {user.name}
             </div>
             <div className="truncate text-[10px] text-ink-3">
-              {CURRENT_USER.email}
+              {user.email}
             </div>
           </div>
         </div>
