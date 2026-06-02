@@ -128,7 +128,9 @@ export default async function ProjectPage({
               {runs.slice(0, 24).map((r, i) => (
                 <div key={r.id} className="absolute inset-0">
                   <Sparkline
-                    data={r.metrics.find((m) => m.name === "train_loss")!.data}
+                    data={
+                      r.metrics.find((m) => m.name === "train_loss")?.data ?? []
+                    }
                     width={1200}
                     height={250}
                     color={muted(i)}
@@ -243,9 +245,10 @@ export default async function ProjectPage({
                     </td>
                     <td className="py-3 text-right">
                       <Sparkline
-                        data={r.metrics
-                          .find((m) => m.name === "train_loss")!
-                          .data.slice(0, 80)}
+                        data={(
+                          r.metrics.find((m) => m.name === "train_loss")?.data ??
+                          []
+                        ).slice(0, 80)}
                         width={92}
                         height={22}
                         color={muted(i)}

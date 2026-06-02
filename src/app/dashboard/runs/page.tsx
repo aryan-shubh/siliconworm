@@ -202,9 +202,10 @@ export default async function AllRunsPage() {
                     </td>
                     <td className="py-3 text-right">
                       <Sparkline
-                        data={r.metrics
-                          .find((m) => m.name === "train_loss")!
-                          .data.slice(0, 80)}
+                        data={(
+                          r.metrics.find((m) => m.name === "train_loss")?.data ??
+                          []
+                        ).slice(0, 80)}
                         width={92}
                         height={22}
                         color="var(--color-ink-3)"
