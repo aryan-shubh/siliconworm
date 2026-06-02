@@ -9,10 +9,11 @@ import * as schema from "../src/lib/schema";
 import { ACME_DEMO_ORG_ID, DEMO_RUN_ID } from "../src/lib/demo-ids";
 import { sql } from "drizzle-orm";
 
-// Re-use the deterministic mock generators that Phase A still imports.
-// After this seed lands and queries point at the DB, the mock files are deleted.
-import { PROJECTS, runsForProject } from "../src/lib/mock";
-import { ARTIFACTS } from "../src/lib/workspace-mock";
+// Deterministic mock generators used only by the seed. Moved here from
+// src/lib/ so the app tree no longer imports them at runtime; they remain
+// available so `bun run db:seed` can regenerate the demo dataset.
+import { PROJECTS, runsForProject } from "./_seed-fixtures/mock";
+import { ARTIFACTS } from "./_seed-fixtures/workspace-mock";
 
 if (process.env.NODE_ENV === "production") {
   throw new Error("scripts/seed.ts refuses to run in NODE_ENV=production");
