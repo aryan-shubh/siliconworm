@@ -3,6 +3,7 @@ import { Hero } from "@/components/marketing/hero";
 import { FeatureBand } from "@/components/marketing/feature-band";
 import { CodeSample } from "@/components/marketing/code-sample";
 import { LiveDemo } from "@/components/marketing/live-demo";
+import { OverlayDemo } from "@/components/marketing/overlay-demo";
 
 export default function Landing() {
   return (
@@ -31,7 +32,7 @@ export default function Landing() {
         eyebrow="03 / compare"
         title="Overlay runs. Spot the regression."
         body="Open the run table, ⌘-click two runs, and silkworm overlays their metric series with shared axes. No notebook required."
-        visual={<LiveDemo />}
+        visual={<OverlayDemo />}
       />
 
       <section className="border-b border-line">
