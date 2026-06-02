@@ -41,6 +41,22 @@ export default async function SweepsPage() {
     getCurrentOrg(),
     listSweeps(ACME_DEMO_ORG_ID),
   ]);
+
+  if (sweeps.length === 0) {
+    return (
+      <>
+        <PageHeader
+          crumbs={[{ href: "/dashboard", label: org.slug }, { label: "Sweeps" }]}
+          title="Sweeps"
+          meta={<span>No sweeps yet</span>}
+        />
+        <div className="p-8 text-[13px] text-ink-3">
+          Sweeps will appear here once the scheduler is online.
+        </div>
+      </>
+    );
+  }
+
   const featured = sweeps.find((s) => s.status === "running") ?? sweeps[0];
   const other = sweeps.filter((s) => s.id !== featured.id);
   const activeCount = sweeps.filter((s) => s.status === "running").length;
