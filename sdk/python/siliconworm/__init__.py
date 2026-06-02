@@ -2,7 +2,7 @@
 
 Quickstart::
 
-    import silkworm as sw
+    import siliconworm as sw
 
     run = sw.init(project="viscount-lm", config={"lr": 3e-4, "batch_size": 512})
 
@@ -14,9 +14,9 @@ Quickstart::
     run.finish()
 
 The SDK always writes a complete record of the run to
-``~/.silkworm/runs/<run-id>/`` — ``metrics.jsonl``, ``summary.json``,
+``~/.siliconworm/runs/<run-id>/`` — ``metrics.jsonl``, ``summary.json``,
 ``config.json``, ``system.json``. If the environment variable
-``SILKWORM_API_URL`` is set, batches are also POSTed to the ingest endpoint;
+``SILICONWORM_API_URL`` is set, batches are also POSTed to the ingest endpoint;
 otherwise the SDK is fully local-only and stays out of the network path.
 """
 

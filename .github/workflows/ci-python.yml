@@ -1,0 +1,64 @@
+name: Python SDK CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "sdk/python/**"
+      - ".github/workflows/ci-python.yml"
+  pull_request:
+    paths:
+      - "sdk/python/**"
+      - ".github/workflows/ci-python.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Python ${{ matrix.python-version }} · ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        os: [ubuntu-latest, macos-latest]
+    defaults:
+      run:
+        working-directory: sdk/python
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install package + dev deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Lint with ruff
+        run: ruff check siliconworm examples
+
+      - name: Verify package metadata builds + parses
+        run: |
+          python -m build --sdist --wheel
+          python -m twine check --strict dist/*
+
+      - name: Smoke-test SDK end-to-end
+        # Quickstart writes ~/.siliconworm/runs/<id>/ — verify all four files
+        # appear and the line count matches what we expect.
+        run: |
+          python examples/quickstart.py
+          set -e
+          RUN=$(ls -t ~/.siliconworm/runs | head -1)
+          for f in config.json metrics.jsonl summary.json system.json; do
+            test -s ~/.siliconworm/runs/"$RUN"/"$f" || { echo "missing $f"; exit 1; }
+            echo "ok  $f"
+          done
+          LINES=$(wc -l < ~/.siliconworm/runs/"$RUN"/metrics.jsonl)
+          test "$LINES" -gt 100 || { echo "expected >100 metric lines, got $LINES"; exit 1; }
+          echo "metrics.jsonl: $LINES lines"

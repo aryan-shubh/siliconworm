@@ -1,47 +1,88 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [project]
-name = "silkworm"
+name = "siliconworm"
 dynamic = ["version"]
-description = "Research-grade experiment tracking SDK for the Silkworm dashboard."
+description = "Research-grade experiment tracking SDK. Local-first; ships to the Siliconworm dashboard when configured."
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
-authors = [{ name = "Silkworm Labs" }]
-keywords = ["machine-learning", "experiment-tracking", "mlops", "metrics"]
+authors = [
+  { name = "Siliconworm Labs" },
+]
+maintainers = [
+  { name = "Siliconworm Labs" },
+]
+keywords = [
+  "machine-learning",
+  "experiment-tracking",
+  "mlops",
+  "metrics",
+  "training",
+  "observability",
+  "wandb",
+  "tensorboard",
+]
 classifiers = [
   "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Environment :: GPU :: NVIDIA CUDA",
+  "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
-  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: System :: Logging",
+  "Typing :: Typed",
 ]
-# Zero required deps — stdlib only. urllib for the optional HTTP client.
+# Stdlib only. Optional extras pull in torch/numpy if you want auto-coercion.
 dependencies = []
 
 [project.optional-dependencies]
-# `pip install silkworm[torch]` enables the helper that converts torch
+# `pip install siliconworm[torch]` enables the helper that converts torch
 # tensors / numpy scalars to plain Python floats inside .log().
 torch = ["torch>=2.0"]
 numpy = ["numpy>=1.24"]
 dev = [
+  "build>=1.2",
+  "twine>=5",
   "pytest>=8",
   "ruff>=0.6",
   "mypy>=1.10",
 ]
 
 [project.urls]
-Homepage = "https://github.com/aryan-shubh/silkworm"
-Source = "https://github.com/aryan-shubh/silkworm"
-Issues = "https://github.com/aryan-shubh/silkworm/issues"
+Homepage = "https://github.com/aryan-shubh/siliconworm"
+Documentation = "https://github.com/aryan-shubh/siliconworm/blob/main/sdk/python/README.md"
+Repository = "https://github.com/aryan-shubh/siliconworm"
+Issues = "https://github.com/aryan-shubh/siliconworm/issues"
+Changelog = "https://github.com/aryan-shubh/siliconworm/blob/main/sdk/python/CHANGELOG.md"
 
 [tool.hatch.version]
-path = "silkworm/version.py"
+path = "siliconworm/version.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "siliconworm/",
+  "examples/",
+  "README.md",
+  "CHANGELOG.md",
+  "LICENSE",
+  "pyproject.toml",
+]
 
 [tool.hatch.build.targets.wheel]
-packages = ["silkworm"]
+packages = ["siliconworm"]
 
 [tool.ruff]
 target-version = "py310"
@@ -49,3 +90,4 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
+ignore = ["B008"]  # function calls in defaults — needed for atexit pattern

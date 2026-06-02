@@ -1,7 +1,7 @@
 """Minimal HTTP client for the optional ingest endpoint.
 
 The SDK is designed to work without ever calling the network. When
-``SILKWORM_API_URL`` is set, batches of log lines are POSTed to
+``SILICONWORM_API_URL`` is set, batches of log lines are POSTed to
 ``<url>/v1/runs/<run_id>/metrics`` as newline-delimited JSON. Failures
 are swallowed after a few retries — the local jsonl is the source of
 truth, so a flaky network never loses data.
@@ -16,7 +16,7 @@ import urllib.error
 import urllib.request
 from typing import Any
 
-logger = logging.getLogger("silkworm.client")
+logger = logging.getLogger("siliconworm.client")
 
 
 class IngestClient:
@@ -45,7 +45,7 @@ class IngestClient:
     def _headers(self) -> dict[str, str]:
         h = {
             "Content-Type": "application/x-ndjson",
-            "User-Agent": f"silkworm-python/{os.environ.get('SILKWORM_VERSION', 'dev')}",
+            "User-Agent": f"siliconworm-python/{os.environ.get('SILICONWORM_VERSION', 'dev')}",
         }
         if self.api_key:
             h["Authorization"] = f"Bearer {self.api_key}"

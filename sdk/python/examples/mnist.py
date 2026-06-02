@@ -1,10 +1,10 @@
-"""MNIST + small MLP, instrumented with silkworm.
+"""MNIST + small MLP, instrumented with siliconworm.
 
 This is the same training spec as `_training/train.py`, ported to use the
 SDK instead of writing jsonl by hand. Re-running it produces a new run id;
 the dashboard can re-bake demo-run-1 from any such run's metrics.jsonl.
 
-    pip install torch torchvision silkworm
+    pip install torch torchvision siliconworm
     python examples/mnist.py
 """
 
@@ -16,7 +16,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
-import silkworm as sw
+import siliconworm as sw
 
 
 class MLP(nn.Module):
@@ -80,7 +80,7 @@ def main() -> None:
             ) ** 0.5
             opt.step()
             if step % 5 == 0:
-                # silkworm.log() accepts torch tensors directly.
+                # siliconworm.log() accepts torch tensors directly.
                 run.log(
                     {"train_loss": loss, "grad_norm": grad_norm, "lr": 3e-4},
                     step=step,

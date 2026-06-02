@@ -1,13 +1,13 @@
 """The Run object — the only thing most users will touch.
 
 A ``Run`` is the lifespan of one training script invocation. It owns a unique
-id, an output directory under ``~/.silkworm/runs/<id>/``, a buffered metric
+id, an output directory under ``~/.siliconworm/runs/<id>/``, a buffered metric
 writer that flushes both to local jsonl and (optionally) to a remote ingest
 endpoint, and a ``summary`` dict that holds aggregate results.
 
 Usage is intentionally tiny::
 
-    run = silkworm.init(project="viscount-lm", config={"lr": 3e-4})
+    run = siliconworm.init(project="viscount-lm", config={"lr": 3e-4})
     run.log({"train_loss": loss}, step=step)
     run.summary["final_acc"] = 0.987
     run.finish()
@@ -31,7 +31,7 @@ from typing import Any, Iterator
 from .client import IngestClient
 from .env import capture as capture_env
 
-logger = logging.getLogger("silkworm.run")
+logger = logging.getLogger("siliconworm.run")
 
 # Module-level singleton — set by `init()`, cleared by `finish()`.
 _current: "Run | None" = None
@@ -154,7 +154,7 @@ class Summary(dict):
 class Run:
     """One training invocation.
 
-    Created by :func:`silkworm.init`. Owns the local output directory, the
+    Created by :func:`siliconworm.init`. Owns the local output directory, the
     background flusher, and the optional HTTP ingest client. Safe to use as
     a context manager — exiting calls :meth:`finish` automatically.
     """
@@ -188,7 +188,7 @@ class Run:
         self.job_type = job_type
         self.summary: Summary = Summary(self)
 
-        base = Path(dir) if dir else Path.home() / ".silkworm" / "runs"
+        base = Path(dir) if dir else Path.home() / ".siliconworm" / "runs"
         self.dir: Path = base / self.id
         self.dir.mkdir(parents=True, exist_ok=True)
         self._metrics_path = self.dir / "metrics.jsonl"
@@ -205,8 +205,8 @@ class Run:
         self._system = capture_env()
 
         self._client = IngestClient(
-            api_url=api_url or os.environ.get("SILKWORM_API_URL"),
-            api_key=api_key or os.environ.get("SILKWORM_API_KEY"),
+            api_url=api_url or os.environ.get("SILICONWORM_API_URL"),
+            api_key=api_key or os.environ.get("SILICONWORM_API_KEY"),
         )
 
         self._write_config()
@@ -216,7 +216,7 @@ class Run:
         # Background flusher — small and dumb, runs until finish().
         self._stop = threading.Event()
         self._flusher = threading.Thread(
-            target=self._flush_loop, name="silkworm-flusher", daemon=True
+            target=self._flush_loop, name="siliconworm-flusher", daemon=True
         )
         self._flusher.start()
 
@@ -225,7 +225,7 @@ class Run:
 
         self._client.post_init(self._init_payload())
 
-        logger.info("silkworm: %s/%s · run=%s · dir=%s",
+        logger.info("siliconworm: %s/%s · run=%s · dir=%s",
                     self.project, self.name, self.id, self.dir)
 
     # ───────────── public API ─────────────
@@ -233,7 +233,7 @@ class Run:
     @property
     def url(self) -> str:
         """Local URI scheme; a hosted dashboard would substitute its own host."""
-        return f"silkworm://{self.project}/{self.id}"
+        return f"siliconworm://{self.project}/{self.id}"
 
     def log(
         self,
@@ -302,7 +302,7 @@ class Run:
         global _current
         if _current is self:
             _current = None
-        logger.info("silkworm: finished %s in %.2fs", self.id, duration)
+        logger.info("siliconworm: finished %s in %.2fs", self.id, duration)
 
     # ───────────── context manager ─────────────
 
@@ -403,13 +403,13 @@ def init(
     """Start a new run and make it the current run.
 
     The returned ``Run`` is also stored as a module-level singleton, so the
-    bare ``silkworm.log(...)`` / ``silkworm.finish()`` helpers will dispatch
+    bare ``siliconworm.log(...)`` / ``siliconworm.finish()`` helpers will dispatch
     to it — handy when threading a ``run`` object through your code is awkward.
     """
     global _current
     if _current is not None and not _current._finished:
         logger.warning(
-            "silkworm.init() called while %s is still active; finishing it",
+            "siliconworm.init() called while %s is still active; finishing it",
             _current.id,
         )
         _current.finish()
@@ -423,7 +423,7 @@ def init(
 def log(metrics: dict[str, Any], *, step: int | None = None) -> None:
     """Log metrics on the current run. Call :func:`init` first."""
     if _current is None:
-        raise RuntimeError("silkworm.log() called before silkworm.init()")
+        raise RuntimeError("siliconworm.log() called before siliconworm.init()")
     _current.log(metrics, step=step)
 
 

@@ -10,3 +10,14 @@ drizzle/migrations
 
 # local training scratch — never push real datasets / checkpoints
 _training/
+
+# Python SDK build artifacts
+sdk/python/dist/
+sdk/python/build/
+sdk/python/*.egg-info/
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

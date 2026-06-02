@@ -4,7 +4,7 @@ Run with::
 
     python examples/quickstart.py
 
-Then inspect ~/.silkworm/runs/<id>/{metrics.jsonl,summary.json,config.json}.
+Then inspect ~/.siliconworm/runs/<id>/{metrics.jsonl,summary.json,config.json}.
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ import math
 import random
 import time
 
-import silkworm as sw
+import siliconworm as sw
 
 
 def main() -> None:
