@@ -137,27 +137,41 @@ you depend on it.
 
 ## Releasing (maintainers)
 
-Releases are pushed to PyPI by a GitHub Actions workflow using **PyPI
-Trusted Publishing** — no API tokens stored anywhere.
+The build + publish flow is driven by **[uv](https://docs.astral.sh/uv/)**
+and PyPI **Trusted Publishing** — no API tokens stored anywhere.
 
 **One-time setup**, on [pypi.org/manage/account/publishing](https://pypi.org/manage/account/publishing/):
 
+- PyPI Project Name: `siliconworm`
 - Owner: `aryan-shubh`
 - Repository name: `siliconworm`
-- Workflow name: `publish-python.yml`
-- Environment name: `pypi` (and a second publisher for `testpypi`)
+- Workflow filename: `publish-python.yml`
+- Environment name: `pypi` (repeat at [test.pypi.org](https://test.pypi.org/manage/account/publishing/) with env `testpypi`)
 
 Then, for each release:
 
-1. Bump `siliconworm/version.py` and add a section to `CHANGELOG.md`.
-2. Open a PR. CI will build + `twine check` the artifacts.
+1. Bump `siliconworm/version.py` and add a `CHANGELOG.md` entry.
+2. Open a PR. CI runs `uv build` + `twine check --strict` + a smoke test.
 3. After merge, draft a GitHub release with tag `sdk-python-vX.Y.Z`
    (e.g. `sdk-python-v0.1.0`). Publishing the release triggers
-   `.github/workflows/publish-python.yml`, which builds the sdist + wheel
-   and uploads to PyPI via OIDC.
+   `.github/workflows/publish-python.yml`, which runs:
 
-You can also dry-run against TestPyPI manually from the Actions tab
-(`Publish Python SDK` → `Run workflow` → `target: testpypi`).
+   ```bash
+   uv build
+   uv publish           # OIDC-authenticated, no token needed
+   ```
+
+Local dry-runs (uses an API token you set as `UV_PUBLISH_TOKEN`):
+
+```bash
+cd sdk/python
+uv build
+uv publish --index testpypi              # → TestPyPI
+uv publish                               # → PyPI (don't do this casually)
+```
+
+You can also dress-rehearse the GitHub flow without touching real PyPI:
+Actions tab → `Publish Python SDK` → `Run workflow` → `target: testpypi`.
 
 ## License
 

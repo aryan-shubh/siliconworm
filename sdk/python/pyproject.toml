@@ -91,3 +91,11 @@ line-length = 100
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
 ignore = ["B008"]  # function calls in defaults — needed for atexit pattern
+
+# `uv publish --index testpypi` uploads to TestPyPI. PyPI is the default,
+# so no entry needed for it.
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true

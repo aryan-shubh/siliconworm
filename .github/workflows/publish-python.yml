@@ -1,8 +1,9 @@
 name: Publish Python SDK
 
 # Triggered when a GitHub release tagged `sdk-python-v*` is published.
-# The trusted-publisher config on PyPI must reference this workflow file
-# (one-time setup: https://docs.pypi.org/trusted-publishers/).
+# Uses uv for both build and publish. uv auto-detects GitHub Actions OIDC
+# and uses PyPI Trusted Publishing — no API tokens stored as secrets.
+# (One-time setup: https://docs.pypi.org/trusted-publishers/.)
 on:
   release:
     types: [published]
@@ -32,19 +33,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: "3.12"
-
-      - name: Install build tooling
-        run: python -m pip install --upgrade build twine
+          enable-cache: true
 
       - name: Build sdist + wheel
-        run: python -m build
+        run: uv build
 
-      - name: Verify metadata with twine
-        run: python -m twine check --strict dist/*
+      - name: Verify metadata
+        run: uv tool run twine check --strict dist/*
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -53,8 +51,8 @@ jobs:
           path: sdk/python/dist/*
 
   # ───────────────── publish to TestPyPI ─────────────────
-  # Runs on `workflow_dispatch` with target=testpypi. Lets you smoke-test the
-  # full release flow before pushing to real PyPI.
+  # Manual `workflow_dispatch` with target=testpypi — for dress-rehearsing
+  # the release flow before pushing to real PyPI.
   publish-testpypi:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.target == 'testpypi' }}
     name: Publish to TestPyPI
@@ -64,19 +62,24 @@ jobs:
       name: testpypi
       url: https://test.pypi.org/project/siliconworm/
     permissions:
-      id-token: write  # required for trusted publishing
+      id-token: write  # OIDC for trusted publishing
+    defaults:
+      run:
+        working-directory: sdk/python
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
       - name: Download distributions
         uses: actions/download-artifact@v4
         with:
           name: dist
-          path: dist
+          path: sdk/python/dist
 
       - name: Publish to TestPyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/
-          packages-dir: dist
+        run: uv publish --index testpypi
 
   # ───────────────── publish to PyPI ─────────────────
   publish-pypi:
@@ -88,15 +91,21 @@ jobs:
       name: pypi
       url: https://pypi.org/project/siliconworm/
     permissions:
-      id-token: write  # required for trusted publishing — no API token needed
+      id-token: write  # OIDC for trusted publishing
+    defaults:
+      run:
+        working-directory: sdk/python
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
       - name: Download distributions
         uses: actions/download-artifact@v4
         with:
           name: dist
-          path: dist
+          path: sdk/python/dist
 
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: dist
+        run: uv publish
