@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { getDb } from "../db";
-import { runs, runMetrics, projects } from "../schema";
+import { runs, runMetrics, projects, users } from "../schema";
 
 export type Run = {
   id: string;
@@ -104,30 +104,37 @@ export async function listRunsForProject(
   const projectId = await projectIdForSlug(projectSlug);
   if (!projectId) return [];
   const rows = await db
-    .select()
+    .select({
+      run: runs,
+      user: { name: users.name, email: users.email },
+    })
     .from(runs)
+    .leftJoin(users, eq(runs.userId, users.id))
     .where(eq(runs.projectId, projectId))
     .orderBy(desc(runs.startedAt))
     .limit(limit);
 
-  const metricsMap = await metricsForRuns(rows.map((r) => r.id));
+  const metricsMap = await metricsForRuns(rows.map((r) => r.run.id));
 
-  return rows.map((r) => ({
-    id: r.id,
-    projectSlug,
-    name: r.displayName,
-    user: "aryan",
-    status: r.status,
-    group: r.group,
-    startedAt: r.startedAt.toISOString(),
-    durationS: (r.durationMs ?? 0) / 1000,
-    tags: r.tags,
-    config: r.config as Run["config"],
-    summary: r.summary as Run["summary"],
-    metrics: metricsMap.get(r.id) ?? METRIC_NAMES.map((name) => ({ name, data: [] })),
-    arch: (r.systemInfo as { arch?: string }).arch ?? "—",
-    gpu: (r.systemInfo as { gpu?: string }).gpu ?? "—",
-  }));
+  return rows.map((row) => {
+    const r = row.run;
+    return {
+      id: r.id,
+      projectSlug,
+      name: r.displayName,
+      user: row.user?.name ?? row.user?.email ?? "unknown",
+      status: r.status,
+      group: r.group,
+      startedAt: r.startedAt.toISOString(),
+      durationS: (r.durationMs ?? 0) / 1000,
+      tags: r.tags,
+      config: r.config as Run["config"],
+      summary: r.summary as Run["summary"],
+      metrics: metricsMap.get(r.id) ?? METRIC_NAMES.map((name) => ({ name, data: [] })),
+      arch: (r.systemInfo as { arch?: string }).arch ?? "—",
+      gpu: (r.systemInfo as { gpu?: string }).gpu ?? "—",
+    };
+  });
 }
 
 export async function getRunById(
@@ -137,16 +144,21 @@ export async function getRunById(
   const db = getDb();
   const projectId = await projectIdForSlug(projectSlug);
   if (!projectId) return null;
-  const [r] = await db
-    .select()
+  const [row] = await db
+    .select({
+      run: runs,
+      user: { name: users.name, email: users.email },
+    })
     .from(runs)
+    .leftJoin(users, eq(runs.userId, users.id))
     .where(and(eq(runs.id, runId), eq(runs.projectId, projectId)));
-  if (!r) return null;
+  if (!row) return null;
+  const r = row.run;
   return {
     id: r.id,
     projectSlug,
     name: r.displayName,
-    user: "aryan",
+    user: row.user?.name ?? row.user?.email ?? "unknown",
     status: r.status,
     group: r.group,
     startedAt: r.startedAt.toISOString(),

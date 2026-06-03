@@ -52,14 +52,15 @@ export type AlertEvent = {
 };
 
 export type CurrentUser = {
-  name: string;
-  email: string;
+  name: string | null;
+  email: string | null;
   initials: string;
 };
 
 export type CurrentOrg = {
-  slug: string;
-  name: string;
+  id: string;
+  slug: string | null;
+  name: string | null;
 };
 
 export async function listSweeps(_orgId: string): Promise<Sweep[]> {
@@ -83,12 +84,12 @@ export async function getCurrentUser(): Promise<CurrentUser> {
     .select({ name: users.name, email: users.email })
     .from(users)
     .limit(1);
-  const name = u?.name ?? "Aryan";
-  const email = u?.email ?? "pahwani.aryan@gmail.com";
+  const name = u?.name ?? null;
+  const email = u?.email ?? null;
   return {
     name,
     email,
-    initials: name
+    initials: (name ?? email ?? "?")
       .split(" ")
       .map((s) => s[0])
       .join("")
@@ -97,10 +98,11 @@ export async function getCurrentUser(): Promise<CurrentUser> {
   };
 }
 
-export async function getCurrentOrg(): Promise<CurrentOrg> {
+export async function getCurrentOrg(): Promise<CurrentOrg | null> {
   const db = getDb();
-  const [o] = await db.select({ slug: orgs.slug, name: orgs.name }).from(orgs).limit(1);
-  return { slug: o?.slug ?? "anthrop-labs", name: o?.name ?? "Anthrop Labs" };
+  const [o] = await db.select({ id: orgs.id, slug: orgs.slug, name: orgs.name }).from(orgs).limit(1);
+  if (!o) return null;
+  return { id: o.id, slug: o.slug ?? null, name: o.name ?? null };
 }
 
 export type WorkspaceSummary = {

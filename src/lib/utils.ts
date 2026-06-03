@@ -1,23 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-// Display-name lookup for the seeded acme demo projects. Sync helper used
-// from RSC tables — when the catalog grows past a static set, swap call
-// sites to use the already-loaded project name from queries instead.
-const PROJECT_NAME_BY_SLUG: Record<string, string> = {
-  "mnist-mlp": "MNIST-MLP",
-  "viscount-lm": "Viscount-LM",
-  "retina-seg": "Retina-Seg",
-  "halcyon-rl": "Halcyon-RL",
-  "thrush-asr": "Thrush-ASR",
-  "obsidian-diffusion": "Obsidian-Diffusion",
-  "ledger-forecast": "Ledger-Forecast",
-};
-
-export function projectName(slug: string): string {
-  return PROJECT_NAME_BY_SLUG[slug] ?? slug;
-}
-
 export function formatBytes(n: number): string {
   if (n < 1024) return `${n} B`;
   const units = ["KB", "MB", "GB", "TB"];

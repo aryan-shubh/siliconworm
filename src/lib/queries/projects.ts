@@ -7,23 +7,10 @@ export type Project = {
   slug: string;
   name: string;
   description: string;
-  framework: string;
+  framework: string | null;
   runCount: number;
   activeCount: number;
   updated: string;
-};
-
-// Framework is not in the schema (it lives in run.systemInfo.arch loosely),
-// so we infer or default. Use a static map for the seeded projects until
-// schema gains a column.
-const FRAMEWORK_BY_SLUG: Record<string, string> = {
-  "mnist-mlp": "PyTorch (CPU)",
-  "viscount-lm": "PyTorch 2.5",
-  "retina-seg": "JAX 0.4",
-  "halcyon-rl": "PyTorch 2.5",
-  "thrush-asr": "PyTorch 2.5",
-  "obsidian-diffusion": "PyTorch 2.5",
-  "ledger-forecast": "JAX 0.4",
 };
 
 export async function listProjects(orgId: string): Promise<Project[]> {
@@ -34,6 +21,7 @@ export async function listProjects(orgId: string): Promise<Project[]> {
       slug: projects.slug,
       name: projects.name,
       description: projects.description,
+      framework: projects.framework,
     })
     .from(projects)
     .where(eq(projects.orgId, orgId));
@@ -71,7 +59,7 @@ export async function listProjects(orgId: string): Promise<Project[]> {
       slug: p.slug,
       name: p.name,
       description: p.description ?? "",
-      framework: FRAMEWORK_BY_SLUG[p.slug] ?? "—",
+      framework: p.framework ?? null,
       runCount: agg.total,
       activeCount: agg.active,
       updated: (agg.latest ?? new Date()).toISOString(),
@@ -100,7 +88,7 @@ export async function getProjectBySlug(
     slug: row.slug,
     name: row.name,
     description: row.description ?? "",
-    framework: FRAMEWORK_BY_SLUG[row.slug] ?? "—",
+    framework: row.framework ?? null,
     runCount: all.length,
     activeCount: all.filter((r) => r.status === "running").length,
     updated: (
