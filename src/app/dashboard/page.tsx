@@ -3,27 +3,19 @@ import { Plus, Search } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
 import { Sparkline } from "@/components/ui/sparkline";
 import { Pill } from "@/components/ui/pill";
-import {
-  ACME_DEMO_ORG_ID,
-  listProjects,
-  getCurrentOrg,
-} from "@/lib/queries";
+import { ACME_DEMO_ORG_ID, listProjects, getCurrentOrg } from "@/lib/queries";
 import { relTime } from "@/lib/utils";
 
 function projSpark(seed: string): number[] {
   const h = seed.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
   return Array.from(
     { length: 40 },
-    (_, i) =>
-      0.5 + Math.sin((i + h) / 5) * 0.25 + Math.cos((i + h) / 11) * 0.18,
+    (_, i) => 0.5 + Math.sin((i + h) / 5) * 0.25 + Math.cos((i + h) / 11) * 0.18,
   );
 }
 
 export default async function DashboardPage() {
-  const [projects, org] = await Promise.all([
-    listProjects(ACME_DEMO_ORG_ID),
-    getCurrentOrg(),
-  ]);
+  const [projects, org] = await Promise.all([listProjects(ACME_DEMO_ORG_ID), getCurrentOrg()]);
   const totalRuns = projects.reduce((s, p) => s + p.runCount, 0);
   const totalActive = projects.reduce((s, p) => s + p.activeCount, 0);
 
@@ -49,6 +41,7 @@ export default async function DashboardPage() {
             <div className="flex items-center gap-2 rounded-md border border-line bg-surface px-2.5 py-1.5 text-[12px] text-ink-3 focus-within:border-line-strong">
               <Search className="h-3.5 w-3.5" />
               <input
+                aria-label="Search projects"
                 placeholder="Search projects…"
                 className="w-44 border-0 bg-transparent text-ink outline-0 placeholder:text-ink-3"
               />
@@ -100,11 +93,7 @@ export default async function DashboardPage() {
                   data={projSpark(p.slug)}
                   width={120}
                   height={42}
-                  color={
-                    p.activeCount > 0
-                      ? "var(--color-success)"
-                      : "var(--color-ink-3)"
-                  }
+                  color={p.activeCount > 0 ? "var(--color-success)" : "var(--color-ink-3)"}
                   fill
                 />
               </div>

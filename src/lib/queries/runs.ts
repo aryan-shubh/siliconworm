@@ -1,5 +1,6 @@
 import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { getDb } from "../db";
+import { DEMO_RUN_ID } from "../demo-ids";
 import { runs, runMetrics, projects } from "../schema";
 
 export type Run = {
@@ -24,21 +25,40 @@ export type Run = {
   gpu: string;
 };
 
-const METRIC_NAMES = [
-  "train_loss",
-  "val_loss",
-  "accuracy",
-  "grad_norm",
-  "lr",
-  "gpu_util",
-];
+const METRIC_NAMES = ["train_loss", "val_loss", "accuracy", "grad_norm", "lr", "gpu_util"];
 
-async function metricsForRun(
+function emptyMetricSeries(): { name: string; data: number[] }[] {
+  return METRIC_NAMES.map((name) => ({ name, data: [] }));
+}
+
+async function demoMetricFallback(runId: string, metricName: string): Promise<number[] | null> {
+  if (runId !== DEMO_RUN_ID) return null;
+
+  const { DEMO_RUN } = await import("../../../scripts/_seed-fixtures/demo-run");
+  const metric = DEMO_RUN.metrics.find((m) => m.name === metricName);
+  return metric?.data ?? null;
+}
+
+async function demoMetricsFallback(
   runId: string,
-): Promise<{ name: string; data: number[] }[]> {
+): Promise<{ name: string; data: number[] }[] | null> {
+  if (runId !== DEMO_RUN_ID) return null;
+
+  const { DEMO_RUN } = await import("../../../scripts/_seed-fixtures/demo-run");
+  return METRIC_NAMES.map((name) => ({
+    name,
+    data: DEMO_RUN.metrics.find((m) => m.name === name)?.data ?? [],
+  }));
+}
+
+async function metricsForRun(runId: string): Promise<{ name: string; data: number[] }[]> {
   const db = getDb();
   const rows = await db
-    .select({ name: runMetrics.name, step: runMetrics.step, value: runMetrics.value })
+    .select({
+      name: runMetrics.name,
+      step: runMetrics.step,
+      value: runMetrics.value,
+    })
     .from(runMetrics)
     .where(eq(runMetrics.runId, runId))
     .orderBy(asc(runMetrics.name), asc(runMetrics.step));
@@ -47,6 +67,10 @@ async function metricsForRun(
   for (const r of rows) {
     if (!byName.has(r.name)) byName.set(r.name, []);
     byName.get(r.name)!.push(r.value);
+  }
+  if (rows.length === 0) {
+    const fallback = await demoMetricsFallback(runId);
+    if (fallback) return fallback;
   }
   return METRIC_NAMES.map((name) => ({ name, data: byName.get(name) ?? [] }));
 }
@@ -70,7 +94,7 @@ async function metricsForRuns(
 
   // Pre-seed each run with the full METRIC_NAMES skeleton.
   for (const id of runIds) {
-    out.set(id, METRIC_NAMES.map((name) => ({ name, data: [] as number[] })));
+    out.set(id, emptyMetricSeries());
   }
   // Group by runId+name, preserving step order from ORDER BY.
   for (const r of rows) {
@@ -88,10 +112,7 @@ async function metricsForRuns(
 
 async function projectIdForSlug(slug: string): Promise<string | null> {
   const db = getDb();
-  const [row] = await db
-    .select({ id: projects.id })
-    .from(projects)
-    .where(eq(projects.slug, slug));
+  const [row] = await db.select({ id: projects.id }).from(projects).where(eq(projects.slug, slug));
   return row?.id ?? null;
 }
 
@@ -124,16 +145,13 @@ export async function listRunsForProject(
     tags: r.tags,
     config: r.config as Run["config"],
     summary: r.summary as Run["summary"],
-    metrics: metricsMap.get(r.id) ?? METRIC_NAMES.map((name) => ({ name, data: [] })),
+    metrics: metricsMap.get(r.id) ?? emptyMetricSeries(),
     arch: (r.systemInfo as { arch?: string }).arch ?? "—",
     gpu: (r.systemInfo as { gpu?: string }).gpu ?? "—",
   }));
 }
 
-export async function getRunById(
-  projectSlug: string,
-  runId: string,
-): Promise<Run | null> {
+export async function getRunById(projectSlug: string, runId: string): Promise<Run | null> {
   const db = getDb();
   const projectId = await projectIdForSlug(projectSlug);
   if (!projectId) return null;
@@ -160,15 +178,24 @@ export async function getRunById(
   };
 }
 
-export async function getRunMetrics(
-  runId: string,
-  metricName: string,
-): Promise<number[]> {
-  const db = getDb();
-  const rows = await db
-    .select({ value: runMetrics.value })
-    .from(runMetrics)
-    .where(and(eq(runMetrics.runId, runId), eq(runMetrics.name, metricName)))
-    .orderBy(asc(runMetrics.step));
-  return rows.map((r) => r.value);
+export async function getRunMetrics(runId: string, metricName: string): Promise<number[]> {
+  try {
+    const db = getDb();
+    const rows = await db
+      .select({ value: runMetrics.value })
+      .from(runMetrics)
+      .where(and(eq(runMetrics.runId, runId), eq(runMetrics.name, metricName)))
+      .orderBy(asc(runMetrics.step));
+
+    if (rows.length > 0) return rows.map((r) => r.value);
+  } catch (error) {
+    const fallback = await demoMetricFallback(runId, metricName);
+    if (fallback) {
+      console.warn(`Using bundled metric fallback for ${runId}/${metricName}.`, error);
+      return fallback;
+    }
+    throw error;
+  }
+
+  return (await demoMetricFallback(runId, metricName)) ?? [];
 }

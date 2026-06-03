@@ -69,31 +69,44 @@ function ChartLegendContent({
           // Get colors count for this item to determine gradient vs solid
           const colorsCount = itemConfig ? getColorsCount(itemConfig) : 1;
 
-          return (
-            <div
-              key={key}
-              className={cn(
-                "[&>svg]:text-muted-foreground flex items-center gap-1.5 transition-opacity [&>svg]:h-3 [&>svg]:w-3",
-                !isSelected && "opacity-30",
-                isClickable && "cursor-pointer",
-              )}
-              onClick={() => {
-                if (!isClickable) return;
-
-                onSelectChange?.(selected === key ? null : key);
-              }}
-            >
+          const content = (
+            <>
               {itemConfig?.icon && !hideIcon ? (
                 <itemConfig.icon />
               ) : (
-                <LegendIndicator
-                  variant={variant}
-                  dataKey={key}
-                  colorsCount={colorsCount}
-                />
+                <LegendIndicator variant={variant} dataKey={key} colorsCount={colorsCount} />
               )}
               {itemConfig?.label}
-            </div>
+            </>
+          );
+
+          const itemClassName = cn(
+            "[&>svg]:text-muted-foreground flex items-center gap-1.5 transition-opacity [&>svg]:h-3 [&>svg]:w-3",
+            !isSelected && "opacity-30",
+          );
+
+          if (!isClickable) {
+            return (
+              <span key={key} className={itemClassName}>
+                {content}
+              </span>
+            );
+          }
+
+          return (
+            <button
+              key={key}
+              type="button"
+              className={cn(
+                itemClassName,
+                "cursor-pointer border-0 bg-transparent p-0 text-inherit",
+              )}
+              onClick={() => {
+                onSelectChange?.(selected === key ? null : key);
+              }}
+            >
+              {content}
+            </button>
           );
         })}
     </div>
@@ -122,41 +135,23 @@ function LegendIndicator({
       return <div className="h-2 w-2 shrink-0" style={fillStyle} />;
 
     case "circle":
-      return (
-        <div className="h-2 w-2 shrink-0 rounded-full" style={fillStyle} />
-      );
+      return <div className="h-2 w-2 shrink-0 rounded-full" style={fillStyle} />;
 
     case "circle-outline":
-      return (
-        <div
-          className="h-2.5 w-2.5 shrink-0 rounded-full p-[1.5px]"
-          style={outlineStyle}
-        />
-      );
+      return <div className="h-2.5 w-2.5 shrink-0 rounded-full p-[1.5px]" style={outlineStyle} />;
 
     case "vertical-bar":
-      return (
-        <div className="h-3 w-1 shrink-0 rounded-[2px]" style={fillStyle} />
-      );
+      return <div className="h-3 w-1 shrink-0 rounded-[2px]" style={fillStyle} />;
 
     case "horizontal-bar":
-      return (
-        <div className="h-1 w-3 shrink-0 rounded-[2px]" style={fillStyle} />
-      );
+      return <div className="h-1 w-3 shrink-0 rounded-[2px]" style={fillStyle} />;
 
     case "rounded-square-outline":
-      return (
-        <div
-          className="h-2.5 w-2.5 shrink-0 rounded-[3px] p-[1.5px]"
-          style={outlineStyle}
-        />
-      );
+      return <div className="h-2.5 w-2.5 shrink-0 rounded-[3px] p-[1.5px]" style={outlineStyle} />;
 
     case "rounded-square":
     default:
-      return (
-        <div className="h-2 w-2 shrink-0 rounded-[2px]" style={fillStyle} />
-      );
+      return <div className="h-2 w-2 shrink-0 rounded-[2px]" style={fillStyle} />;
   }
 }
 
@@ -165,10 +160,7 @@ function LegendIndicator({
 // ---------------------------------------------------------------------------
 
 /** Solid fill / gradient background for filled variants. */
-function getLegendFillStyle(
-  dataKey: string,
-  colorsCount: number,
-): React.CSSProperties {
+function getLegendFillStyle(dataKey: string, colorsCount: number): React.CSSProperties {
   if (colorsCount <= 1) {
     return { backgroundColor: `var(--color-${dataKey}-0)` };
   }
@@ -187,13 +179,9 @@ function getLegendFillStyle(
  * "border" visible. Works with both solid colors and gradients, and respects
  * border-radius — unlike plain `border-color`.
  */
-function getLegendOutlineStyle(
-  dataKey: string,
-  colorsCount: number,
-): React.CSSProperties {
+function getLegendOutlineStyle(dataKey: string, colorsCount: number): React.CSSProperties {
   const maskStyle: React.CSSProperties = {
-    WebkitMask:
-      "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+    WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
     WebkitMaskComposite: "xor",
     mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
     maskComposite: "exclude",

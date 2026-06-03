@@ -1,22 +1,10 @@
 import Link from "next/link";
-import {
-  ArrowUpRight,
-  GitBranch,
-  Pause,
-  Play,
-  Plus,
-  Search,
-} from "lucide-react";
+import { ArrowUpRight, GitBranch, Pause, Play, Plus, Search } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
 import { Sparkline } from "@/components/ui/sparkline";
 import { StatusDot } from "@/components/ui/status-dot";
 import { Pill } from "@/components/ui/pill";
-import {
-  ACME_DEMO_ORG_ID,
-  getCurrentOrg,
-  listSweeps,
-  type Sweep,
-} from "@/lib/queries";
+import { ACME_DEMO_ORG_ID, getCurrentOrg, listSweeps, type Sweep } from "@/lib/queries";
 import { projectName, relTime } from "@/lib/utils";
 
 const METHOD_LABEL: Record<Sweep["method"], string> = {
@@ -26,10 +14,7 @@ const METHOD_LABEL: Record<Sweep["method"], string> = {
   hyperband: "Hyperband",
 };
 
-const STATUS_TONE: Record<
-  Sweep["status"],
-  "success" | "neutral" | "warn" | "info"
-> = {
+const STATUS_TONE: Record<Sweep["status"], "success" | "neutral" | "warn" | "info"> = {
   running: "success",
   finished: "neutral",
   queued: "info",
@@ -37,10 +22,7 @@ const STATUS_TONE: Record<
 };
 
 export default async function SweepsPage() {
-  const [org, sweeps] = await Promise.all([
-    getCurrentOrg(),
-    listSweeps(ACME_DEMO_ORG_ID),
-  ]);
+  const [org, sweeps] = await Promise.all([getCurrentOrg(), listSweeps(ACME_DEMO_ORG_ID)]);
 
   if (sweeps.length === 0) {
     return (
@@ -84,6 +66,7 @@ export default async function SweepsPage() {
             <div className="flex items-center gap-2 rounded-md border border-line bg-surface px-2.5 py-1.5 focus-within:border-line-strong">
               <Search className="h-3.5 w-3.5 text-ink-3" />
               <input
+                aria-label="Search sweeps"
                 placeholder="Search sweeps…"
                 className="w-48 border-0 bg-transparent text-[12px] text-ink outline-0 placeholder:text-ink-3"
               />
@@ -107,16 +90,12 @@ export default async function SweepsPage() {
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-[13px] font-semibold text-ink">All sweeps</h2>
             <div className="flex gap-1">
-              {(
-                ["All", "Running", "Finished", "Paused", "Queued"] as const
-              ).map((t, i) => (
+              {(["All", "Running", "Finished", "Paused", "Queued"] as const).map((t, i) => (
                 <button
                   key={t}
                   type="button"
                   className={`rounded-md px-3 py-1 text-[12px] font-medium ${
-                    i === 0
-                      ? "bg-surface-2 text-ink"
-                      : "text-ink-2 hover:text-ink"
+                    i === 0 ? "bg-surface-2 text-ink" : "text-ink-2 hover:text-ink"
                   }`}
                 >
                   {t}
@@ -172,14 +151,10 @@ function FeaturedSweep({ sweep: s }: { sweep: Sweep }) {
               {projectName(s.projectSlug)}
             </Link>
           </div>
-          <h2 className="mt-2 text-[22px] font-semibold tracking-tight text-ink">
-            {s.name}
-          </h2>
+          <h2 className="mt-2 text-[22px] font-semibold tracking-tight text-ink">{s.name}</h2>
           <p className="mt-1 text-[12px] text-ink-3">
             Started {relTime(s.startedAt)} · {s.activeWorkers} workers · seeking{" "}
-            <span className="text-ink-2">
-              {s.objective === "min" ? "↓ minimum" : "↑ maximum"}
-            </span>{" "}
+            <span className="text-ink-2">{s.objective === "min" ? "↓ minimum" : "↑ maximum"}</span>{" "}
             <span className="font-mono text-ink-2">{s.bestMetricName}</span>
           </p>
         </div>
@@ -215,8 +190,7 @@ function FeaturedSweep({ sweep: s }: { sweep: Sweep }) {
           <div className="mb-3 flex items-baseline justify-between">
             <div>
               <h3 className="text-[12px] font-medium text-ink-2">
-                Best <span className="font-mono">{s.bestMetricName}</span> over
-                trials
+                Best <span className="font-mono">{s.bestMetricName}</span> over trials
               </h3>
               <p className="mt-0.5 text-[11px] text-ink-3">
                 Lower-envelope of every trial's final value
@@ -226,9 +200,7 @@ function FeaturedSweep({ sweep: s }: { sweep: Sweep }) {
               <div className="font-mono text-[24px] font-semibold tabular text-ink">
                 {s.bestMetricValue.toFixed(3)}
               </div>
-              <div className="text-[11px] text-ink-3">
-                at trial {s.bestSoFar.length}
-              </div>
+              <div className="text-[11px] text-ink-3">at trial {s.bestSoFar.length}</div>
             </div>
           </div>
           {s.bestSoFar.length > 0 ? (
@@ -236,9 +208,7 @@ function FeaturedSweep({ sweep: s }: { sweep: Sweep }) {
               data={s.bestSoFar}
               width={700}
               height={140}
-              color={
-                isImproving ? "var(--color-success)" : "var(--color-ink-3)"
-              }
+              color={isImproving ? "var(--color-success)" : "var(--color-ink-3)"}
               strokeWidth={1.4}
               fill
             />
@@ -268,9 +238,7 @@ function FeaturedSweep({ sweep: s }: { sweep: Sweep }) {
 
         {/* Best config */}
         <div className="p-5">
-          <h3 className="mb-3 text-[12px] font-medium text-ink-2">
-            Best configuration
-          </h3>
+          <h3 className="mb-3 text-[12px] font-medium text-ink-2">Best configuration</h3>
           {Object.keys(s.bestConfig).length === 0 ? (
             <div className="rounded-md border border-dashed border-line px-3 py-6 text-center text-[12px] text-ink-3">
               No trials have completed yet
@@ -345,12 +313,9 @@ function SweepCard({ sweep: s }: { sweep: Sweep }) {
         <div className="rounded-md border border-line bg-canvas p-3">
           <div className="mb-2 flex items-baseline justify-between text-[11px] text-ink-3">
             <span>
-              Best{" "}
-              <span className="font-mono text-ink-2">{s.bestMetricName}</span>
+              Best <span className="font-mono text-ink-2">{s.bestMetricName}</span>
             </span>
-            <span className="font-mono tabular text-ink">
-              {s.bestMetricValue.toFixed(3)}
-            </span>
+            <span className="font-mono tabular text-ink">{s.bestMetricValue.toFixed(3)}</span>
           </div>
           <Sparkline
             data={s.bestSoFar}
@@ -375,9 +340,7 @@ function SweepCard({ sweep: s }: { sweep: Sweep }) {
         </div>
         <div className="h-1 w-full overflow-hidden rounded-full bg-line">
           <div
-            className={`h-full rounded-full ${
-              s.status === "running" ? "bg-success" : "bg-ink-3"
-            }`}
+            className={`h-full rounded-full ${s.status === "running" ? "bg-success" : "bg-ink-3"}`}
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -386,15 +349,7 @@ function SweepCard({ sweep: s }: { sweep: Sweep }) {
   );
 }
 
-function Metric({
-  label,
-  value,
-  extra,
-}: {
-  label: string;
-  value: string;
-  extra: string;
-}) {
+function Metric({ label, value, extra }: { label: string; value: string; extra: string }) {
   return (
     <div>
       <div className="text-[11px] text-ink-3">{label}</div>

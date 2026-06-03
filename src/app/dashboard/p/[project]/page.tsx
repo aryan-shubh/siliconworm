@@ -1,13 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  ArrowUpRight,
-  Filter,
-  GitBranch,
-  Play,
-  Search,
-  SlidersHorizontal,
-} from "lucide-react";
+import { ArrowUpRight, Filter, GitBranch, Play, Search, SlidersHorizontal } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
 import { Sparkline } from "@/components/ui/sparkline";
 import { StatusDot } from "@/components/ui/status-dot";
@@ -20,11 +13,7 @@ import {
 } from "@/lib/queries";
 import { formatDuration, formatNum, relTime } from "@/lib/utils";
 
-export default async function ProjectPage({
-  params,
-}: {
-  params: Promise<{ project: string }>;
-}) {
+export default async function ProjectPage({ params }: { params: Promise<{ project: string }> }) {
   const { project: slug } = await params;
   const [project, org] = await Promise.all([
     getProjectBySlug(ACME_DEMO_ORG_ID, slug),
@@ -35,20 +24,13 @@ export default async function ProjectPage({
 
   const activeCount = runs.filter((r) => r.status === "running").length;
   const finishedCount = runs.filter((r) => r.status === "finished").length;
-  const failedCount = runs.filter(
-    (r) => r.status === "failed" || r.status === "crashed",
-  ).length;
-  const bestVal = runs.length
-    ? Math.min(...runs.map((r) => r.summary.val_loss))
-    : null;
+  const failedCount = runs.filter((r) => r.status === "failed" || r.status === "crashed").length;
+  const bestVal = runs.length ? Math.min(...runs.map((r) => r.summary.val_loss)) : null;
 
   return (
     <>
       <PageHeader
-        crumbs={[
-          { href: "/dashboard", label: org.slug },
-          { label: project.slug },
-        ]}
+        crumbs={[{ href: "/dashboard", label: org.slug }, { label: project.slug }]}
         title={project.name}
         meta={
           <>
@@ -59,16 +41,10 @@ export default async function ProjectPage({
         }
         actions={
           <>
-            <Button
-              icon={<GitBranch className="h-3.5 w-3.5" />}
-              variant="secondary"
-            >
+            <Button icon={<GitBranch className="h-3.5 w-3.5" />} variant="secondary">
               Sweeps
             </Button>
-            <Button
-              icon={<SlidersHorizontal className="h-3.5 w-3.5" />}
-              variant="secondary"
-            >
+            <Button icon={<SlidersHorizontal className="h-3.5 w-3.5" />} variant="secondary">
               Compare
             </Button>
             <Button icon={<Play className="h-3.5 w-3.5" />} variant="primary">
@@ -87,11 +63,7 @@ export default async function ProjectPage({
             sublabel={`${activeCount} live`}
             live={activeCount > 0}
           />
-          <StatCard
-            label="Finished"
-            value={finishedCount.toString()}
-            sublabel="last 24h"
-          />
+          <StatCard label="Finished" value={finishedCount.toString()} sublabel="last 24h" />
           <StatCard
             label="Failed"
             value={failedCount.toString()}
@@ -110,9 +82,7 @@ export default async function ProjectPage({
         <section className="rounded-lg border border-line bg-surface">
           <header className="flex items-center justify-between border-b border-line px-4 py-3">
             <div>
-              <h2 className="text-[14px] font-semibold text-ink">
-                Train loss · all runs
-              </h2>
+              <h2 className="text-[14px] font-semibold text-ink">Train loss · all runs</h2>
               <p className="mt-0.5 text-[12px] text-ink-3">
                 Overlay of {Math.min(runs.length, 24)} runs · step 0 → 200,000
               </p>
@@ -128,9 +98,7 @@ export default async function ProjectPage({
               {runs.slice(0, 24).map((r, i) => (
                 <div key={r.id} className="absolute inset-0">
                   <Sparkline
-                    data={
-                      r.metrics.find((m) => m.name === "train_loss")?.data ?? []
-                    }
+                    data={r.metrics.find((m) => m.name === "train_loss")?.data ?? []}
                     width={1200}
                     height={250}
                     color={muted(i)}
@@ -152,6 +120,7 @@ export default async function ProjectPage({
               <div className="flex items-center gap-2 rounded-md border border-line bg-canvas px-2 py-1.5 focus-within:border-line-strong">
                 <Search className="h-3.5 w-3.5 text-ink-3" />
                 <input
+                  aria-label="Filter runs"
                   placeholder="Filter: lr<3e-4 and tag:baseline"
                   className="w-72 border-0 bg-transparent text-[12px] text-ink outline-0 placeholder:text-ink-3"
                 />
@@ -173,7 +142,7 @@ export default async function ProjectPage({
             <table className="w-full min-w-[1100px] text-[13px]">
               <thead>
                 <tr className="border-b border-line text-[11px] font-medium uppercase tracking-wider text-ink-3">
-                  <th className="w-10 py-2 pl-4 text-left font-medium"></th>
+                  <th aria-label="Status" className="w-10 py-2 pl-4 text-left font-medium"></th>
                   <th className="py-2 text-left font-medium">Run</th>
                   <th className="py-2 text-left font-medium">User</th>
                   <th className="py-2 text-left font-medium">Group</th>
@@ -184,15 +153,12 @@ export default async function ProjectPage({
                   <th className="py-2 text-right font-medium">val_loss</th>
                   <th className="py-2 text-right font-medium">Acc.</th>
                   <th className="py-2 text-right font-medium">Trace</th>
-                  <th className="w-10 py-2 pr-4 text-right font-medium"></th>
+                  <th aria-label="Open run" className="w-10 py-2 pr-4 text-right font-medium"></th>
                 </tr>
               </thead>
               <tbody className="text-ink-2">
                 {runs.slice(0, 50).map((r, i) => (
-                  <tr
-                    key={r.id}
-                    className="group border-b border-line/70 hover:bg-surface-2/60"
-                  >
+                  <tr key={r.id} className="group border-b border-line/70 hover:bg-surface-2/60">
                     <td className="py-3 pl-4">
                       <StatusDot status={r.status} />
                     </td>
@@ -216,12 +182,8 @@ export default async function ProjectPage({
                       </Link>
                     </td>
                     <td className="py-3 text-ink-2">{r.user}</td>
-                    <td className="py-3 text-[12px] text-ink-3">
-                      {r.group ?? "—"}
-                    </td>
-                    <td className="py-3 text-right text-ink-3">
-                      {relTime(r.startedAt)}
-                    </td>
+                    <td className="py-3 text-[12px] text-ink-3">{r.group ?? "—"}</td>
+                    <td className="py-3 text-right text-ink-3">{relTime(r.startedAt)}</td>
                     <td className="py-3 text-right font-mono tabular">
                       {formatDuration(r.durationS)}
                     </td>
@@ -235,20 +197,16 @@ export default async function ProjectPage({
                       {r.summary.val_loss.toFixed(3)}
                     </td>
                     <td className="py-3 text-right font-mono tabular">
-                      <span
-                        className={
-                          r.summary.accuracy > 0.9 ? "text-success" : "text-ink"
-                        }
-                      >
+                      <span className={r.summary.accuracy > 0.9 ? "text-success" : "text-ink"}>
                         {(r.summary.accuracy * 100).toFixed(1)}%
                       </span>
                     </td>
                     <td className="py-3 text-right">
                       <Sparkline
-                        data={(
-                          r.metrics.find((m) => m.name === "train_loss")?.data ??
-                          []
-                        ).slice(0, 80)}
+                        data={(r.metrics.find((m) => m.name === "train_loss")?.data ?? []).slice(
+                          0,
+                          80,
+                        )}
                         width={92}
                         height={22}
                         color={muted(i)}
@@ -318,23 +276,14 @@ function StatCard({
   live?: boolean;
   tone?: "neutral" | "success" | "fail";
 }) {
-  const valueCls =
-    tone === "success"
-      ? "text-success"
-      : tone === "fail"
-        ? "text-fail"
-        : "text-ink";
+  const valueCls = tone === "success" ? "text-success" : tone === "fail" ? "text-fail" : "text-ink";
   return (
     <div className="rounded-lg border border-line bg-surface p-4">
       <div className="flex items-center justify-between">
         <span className="text-[12px] text-ink-3">{label}</span>
-        {live && (
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-success" />
-        )}
+        {live && <span className="inline-block h-1.5 w-1.5 rounded-full bg-success" />}
       </div>
-      <div
-        className={`mt-1.5 text-[28px] font-semibold tracking-tight tabular ${valueCls}`}
-      >
+      <div className={`mt-1.5 text-[28px] font-semibold tracking-tight tabular ${valueCls}`}>
         {value}
       </div>
       <div className="mt-0.5 text-[12px] text-ink-3">{sublabel}</div>

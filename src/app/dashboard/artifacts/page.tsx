@@ -1,13 +1,5 @@
 import Link from "next/link";
-import {
-  ArrowUpRight,
-  Box,
-  Code,
-  Database,
-  FileBarChart,
-  Search,
-  Upload,
-} from "lucide-react";
+import { ArrowUpRight, Box, Code, Database, FileBarChart, Search, Upload } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
 import { Pill } from "@/components/ui/pill";
 import {
@@ -46,10 +38,7 @@ export default async function ArtifactsPage() {
   return (
     <>
       <PageHeader
-        crumbs={[
-          { href: "/dashboard", label: org.slug },
-          { label: "Artifacts" },
-        ]}
+        crumbs={[{ href: "/dashboard", label: org.slug }, { label: "Artifacts" }]}
         title="Artifacts"
         meta={
           <>
@@ -65,6 +54,7 @@ export default async function ArtifactsPage() {
             <div className="flex items-center gap-2 rounded-md border border-line bg-surface px-2.5 py-1.5 focus-within:border-line-strong">
               <Search className="h-3.5 w-3.5 text-ink-3" />
               <input
+                aria-label="Search artifacts"
                 placeholder="Search by name or SHA…"
                 className="w-56 border-0 bg-transparent text-[12px] text-ink outline-0 placeholder:text-ink-3"
               />
@@ -110,8 +100,8 @@ export default async function ArtifactsPage() {
             <div>
               <h2 className="text-[13px] font-semibold text-ink">Storage</h2>
               <p className="mt-0.5 text-[12px] text-ink-3">
-                {formatBytes(totalBytes)} of 1.50 TB plan ·{" "}
-                {totalDownloads.toLocaleString()} lifetime downloads
+                {formatBytes(totalBytes)} of 1.50 TB plan · {totalDownloads.toLocaleString()}{" "}
+                lifetime downloads
               </p>
             </div>
             <div className="text-[12px] text-ink-3">
@@ -122,50 +112,42 @@ export default async function ArtifactsPage() {
             </div>
           </div>
           <div className="mt-3 flex h-2 w-full overflow-hidden rounded-full bg-line">
-            {(["model", "dataset", "code", "result"] as ArtifactType[]).map(
-              (t) => {
-                const sum = byType(t).reduce((s, a) => s + a.sizeBytes, 0);
-                const pct = (sum / totalBytes) * 100;
-                const bgs: Record<ArtifactType, string> = {
-                  model: "bg-info",
-                  dataset: "bg-success",
-                  code: "bg-ink-3",
-                  result: "bg-warn",
-                };
-                return (
-                  <div
-                    key={t}
-                    className={bgs[t]}
-                    style={{ width: `${pct}%` }}
-                    title={`${TYPE_META[t].label}: ${formatBytes(sum)}`}
-                  />
-                );
-              },
-            )}
+            {(["model", "dataset", "code", "result"] as ArtifactType[]).map((t) => {
+              const sum = byType(t).reduce((s, a) => s + a.sizeBytes, 0);
+              const pct = (sum / totalBytes) * 100;
+              const bgs: Record<ArtifactType, string> = {
+                model: "bg-info",
+                dataset: "bg-success",
+                code: "bg-ink-3",
+                result: "bg-warn",
+              };
+              return (
+                <div
+                  key={t}
+                  className={bgs[t]}
+                  style={{ width: `${pct}%` }}
+                  title={`${TYPE_META[t].label}: ${formatBytes(sum)}`}
+                />
+              );
+            })}
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-4 text-[11px] text-ink-3">
-            {(["model", "dataset", "code", "result"] as ArtifactType[]).map(
-              (t) => {
-                const sum = byType(t).reduce((s, a) => s + a.sizeBytes, 0);
-                const dots: Record<ArtifactType, string> = {
-                  model: "bg-info",
-                  dataset: "bg-success",
-                  code: "bg-ink-3",
-                  result: "bg-warn",
-                };
-                return (
-                  <span key={t} className="flex items-center gap-1.5">
-                    <span
-                      className={`inline-block h-2 w-2 rounded-sm ${dots[t]}`}
-                    />
-                    <span>{TYPE_META[t].label}s</span>
-                    <span className="font-mono tabular text-ink-2">
-                      {formatBytes(sum)}
-                    </span>
-                  </span>
-                );
-              },
-            )}
+            {(["model", "dataset", "code", "result"] as ArtifactType[]).map((t) => {
+              const sum = byType(t).reduce((s, a) => s + a.sizeBytes, 0);
+              const dots: Record<ArtifactType, string> = {
+                model: "bg-info",
+                dataset: "bg-success",
+                code: "bg-ink-3",
+                result: "bg-warn",
+              };
+              return (
+                <span key={t} className="flex items-center gap-1.5">
+                  <span className={`inline-block h-2 w-2 rounded-sm ${dots[t]}`} />
+                  <span>{TYPE_META[t].label}s</span>
+                  <span className="font-mono tabular text-ink-2">{formatBytes(sum)}</span>
+                </span>
+              );
+            })}
           </div>
         </section>
 
@@ -214,7 +196,10 @@ export default async function ArtifactsPage() {
                 <th className="py-2 text-left font-medium">Source run</th>
                 <th className="py-2 text-right font-medium">Downloads</th>
                 <th className="py-2 text-right font-medium">Created</th>
-                <th className="w-10 py-2 pr-4 text-right font-medium"></th>
+                <th
+                  aria-label="Open artifact"
+                  className="w-10 py-2 pr-4 text-right font-medium"
+                ></th>
               </tr>
             </thead>
             <tbody className="text-ink-2">
@@ -228,10 +213,7 @@ export default async function ArtifactsPage() {
                   >
                     <td className="py-3 pl-4">
                       <div className="flex items-center gap-2">
-                        <Icon
-                          className="h-3.5 w-3.5 text-ink-3"
-                          strokeWidth={1.6}
-                        />
+                        <Icon className="h-3.5 w-3.5 text-ink-3" strokeWidth={1.6} />
                         <span className="font-medium text-ink group-hover:text-accent">
                           {a.name}
                         </span>
@@ -251,15 +233,11 @@ export default async function ArtifactsPage() {
                         {projectName(a.projectSlug)}
                       </Link>
                     </td>
-                    <td className="py-3 font-mono tabular">
-                      v{a.latestVersion}
-                    </td>
+                    <td className="py-3 font-mono tabular">v{a.latestVersion}</td>
                     <td className="py-3 text-right font-mono tabular text-ink">
                       {formatBytes(a.sizeBytes)}
                     </td>
-                    <td className="py-3 font-mono text-[12px] text-ink-3">
-                      {a.sha256}
-                    </td>
+                    <td className="py-3 font-mono text-[12px] text-ink-3">{a.sha256}</td>
                     <td className="py-3">
                       <Link
                         href={`/dashboard/p/${a.projectSlug}/runs/${a.sourceRunId}`}
@@ -271,9 +249,7 @@ export default async function ArtifactsPage() {
                     <td className="py-3 text-right font-mono tabular text-ink-2">
                       {a.downloads.toLocaleString()}
                     </td>
-                    <td className="py-3 text-right text-ink-3">
-                      {relTime(a.createdAt)}
-                    </td>
+                    <td className="py-3 text-right text-ink-3">{relTime(a.createdAt)}</td>
                     <td className="py-3 pr-4 text-right">
                       <ArrowUpRight className="ml-auto h-3.5 w-3.5 text-ink-3 group-hover:text-accent" />
                     </td>
@@ -309,18 +285,14 @@ function TypeCard({
     <div className="rounded-lg border border-line bg-surface p-4">
       <div className="flex items-center justify-between">
         <span className="text-[12px] text-ink-3">{meta.label}s</span>
-        <span
-          className={`grid h-6 w-6 place-items-center rounded-sm ${tones[meta.tone]}`}
-        >
+        <span className={`grid h-6 w-6 place-items-center rounded-sm ${tones[meta.tone]}`}>
           <Icon className="h-3.5 w-3.5" strokeWidth={1.6} />
         </span>
       </div>
       <div className="mt-1.5 text-[28px] font-semibold tracking-tight tabular text-ink">
         {count}
       </div>
-      <div className="mt-0.5 text-[12px] text-ink-3">
-        {formatBytes(sizeBytes)}
-      </div>
+      <div className="mt-0.5 text-[12px] text-ink-3">{formatBytes(sizeBytes)}</div>
     </div>
   );
 }

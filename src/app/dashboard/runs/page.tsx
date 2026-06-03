@@ -1,11 +1,5 @@
 import Link from "next/link";
-import {
-  ArrowUpRight,
-  Download,
-  Filter,
-  Search,
-  SlidersHorizontal,
-} from "lucide-react";
+import { ArrowUpRight, Download, Filter, Search, SlidersHorizontal } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
 import { Sparkline } from "@/components/ui/sparkline";
 import { StatusDot } from "@/components/ui/status-dot";
@@ -19,10 +13,7 @@ import {
 import { formatDuration, projectName, relTime } from "@/lib/utils";
 
 export default async function AllRunsPage() {
-  const [org, projects] = await Promise.all([
-    getCurrentOrg(),
-    listProjects(ACME_DEMO_ORG_ID),
-  ]);
+  const [org, projects] = await Promise.all([getCurrentOrg(), listProjects(ACME_DEMO_ORG_ID)]);
 
   // Aggregate across every project. We don't sort; rows naturally fall by
   // recency because mock.ts already sorts each project's runs newest-first.
@@ -35,9 +26,7 @@ export default async function AllRunsPage() {
   const total = all.length;
   const running = all.filter((r) => r.status === "running").length;
   const finished = all.filter((r) => r.status === "finished").length;
-  const failed = all.filter(
-    (r) => r.status === "failed" || r.status === "crashed",
-  ).length;
+  const failed = all.filter((r) => r.status === "failed" || r.status === "crashed").length;
 
   return (
     <>
@@ -77,11 +66,7 @@ export default async function AllRunsPage() {
       <div className="space-y-6 p-8">
         {/* Stat row */}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <StatCard
-            label="Total runs"
-            value={total.toLocaleString()}
-            sublabel="last 7 days"
-          />
+          <StatCard label="Total runs" value={total.toLocaleString()} sublabel="last 7 days" />
           <StatCard
             label="Running"
             value={running.toString()}
@@ -107,6 +92,7 @@ export default async function AllRunsPage() {
             <div className="flex items-center gap-2 rounded-md border border-line bg-canvas px-2.5 py-1.5 focus-within:border-line-strong">
               <Search className="h-3.5 w-3.5 text-ink-3" />
               <input
+                aria-label="Search runs"
                 placeholder="Search runs, users, tags…"
                 className="w-72 border-0 bg-transparent text-[12px] text-ink outline-0 placeholder:text-ink-3"
               />
@@ -133,7 +119,7 @@ export default async function AllRunsPage() {
             <table className="w-full min-w-[1200px] text-[13px]">
               <thead>
                 <tr className="border-b border-line text-[11px] font-medium uppercase tracking-wider text-ink-3">
-                  <th className="w-10 py-2 pl-4 text-left font-medium"></th>
+                  <th aria-label="Status" className="w-10 py-2 pl-4 text-left font-medium"></th>
                   <th className="py-2 text-left font-medium">Run</th>
                   <th className="py-2 text-left font-medium">Project</th>
                   <th className="py-2 text-left font-medium">User</th>
@@ -143,7 +129,7 @@ export default async function AllRunsPage() {
                   <th className="py-2 text-right font-medium">val_loss</th>
                   <th className="py-2 text-right font-medium">Acc.</th>
                   <th className="py-2 text-right font-medium">Trace</th>
-                  <th className="w-10 py-2 pr-4 text-right font-medium"></th>
+                  <th aria-label="Open run" className="w-10 py-2 pr-4 text-right font-medium"></th>
                 </tr>
               </thead>
               <tbody className="text-ink-2">
@@ -179,9 +165,7 @@ export default async function AllRunsPage() {
                       </Link>
                     </td>
                     <td className="py-3 text-ink-2">{r.user}</td>
-                    <td className="py-3 text-right text-ink-3">
-                      {relTime(r.startedAt)}
-                    </td>
+                    <td className="py-3 text-right text-ink-3">{relTime(r.startedAt)}</td>
                     <td className="py-3 text-right font-mono tabular">
                       {formatDuration(r.durationS)}
                     </td>
@@ -192,20 +176,16 @@ export default async function AllRunsPage() {
                       {r.summary.val_loss.toFixed(3)}
                     </td>
                     <td className="py-3 text-right font-mono tabular">
-                      <span
-                        className={
-                          r.summary.accuracy > 0.9 ? "text-success" : "text-ink"
-                        }
-                      >
+                      <span className={r.summary.accuracy > 0.9 ? "text-success" : "text-ink"}>
                         {(r.summary.accuracy * 100).toFixed(1)}%
                       </span>
                     </td>
                     <td className="py-3 text-right">
                       <Sparkline
-                        data={(
-                          r.metrics.find((m) => m.name === "train_loss")?.data ??
-                          []
-                        ).slice(0, 80)}
+                        data={(r.metrics.find((m) => m.name === "train_loss")?.data ?? []).slice(
+                          0,
+                          80,
+                        )}
                         width={92}
                         height={22}
                         color="var(--color-ink-3)"
@@ -254,18 +234,11 @@ function StatCard({
   sublabel: string;
   tone?: "neutral" | "success" | "fail";
 }) {
-  const valueCls =
-    tone === "success"
-      ? "text-success"
-      : tone === "fail"
-        ? "text-fail"
-        : "text-ink";
+  const valueCls = tone === "success" ? "text-success" : tone === "fail" ? "text-fail" : "text-ink";
   return (
     <div className="rounded-lg border border-line bg-surface p-4">
       <div className="text-[12px] text-ink-3">{label}</div>
-      <div
-        className={`mt-1.5 text-[28px] font-semibold tracking-tight tabular ${valueCls}`}
-      >
+      <div className={`mt-1.5 text-[28px] font-semibold tracking-tight tabular ${valueCls}`}>
         {value}
       </div>
       <div className="mt-0.5 text-[12px] text-ink-3">{sublabel}</div>
