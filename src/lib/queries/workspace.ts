@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "../db";
-import { orgs, users, projects, runs } from "../schema";
+import { orgs, projects, runs } from "../schema";
+import { getCurrentSession } from "@/lib/auth/current-user";
 
 export type Sweep = {
   id: string;
@@ -52,8 +53,10 @@ export type AlertEvent = {
 };
 
 export type CurrentUser = {
+  id: string;
   name: string | null;
   email: string | null;
+  image: string | null;
   initials: string;
 };
 
@@ -77,18 +80,15 @@ export async function listAlertEvents(_orgId: string): Promise<AlertEvent[]> {
   return [];
 }
 
-export async function getCurrentUser(): Promise<CurrentUser> {
-  // Until Better Auth is wired, return the single seeded user.
-  const db = getDb();
-  const [u] = await db
-    .select({ name: users.name, email: users.email })
-    .from(users)
-    .limit(1);
-  const name = u?.name ?? null;
-  const email = u?.email ?? null;
+export async function getCurrentUser(): Promise<CurrentUser | null> {
+  const session = await getCurrentSession();
+  if (!session) return null;
+  const { userId, name, email, image } = session;
   return {
+    id: userId,
     name,
     email,
+    image,
     initials: (name ?? email ?? "?")
       .split(" ")
       .map((s) => s[0])

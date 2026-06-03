@@ -95,14 +95,14 @@ export async function Sidebar() {
       <div className="flex items-center justify-between gap-2 border-t border-line p-3">
         <div className="flex min-w-0 items-center gap-2">
           <div className="grid h-7 w-7 place-items-center rounded-full bg-ink text-[10px] font-semibold text-canvas">
-            {user.initials}
+            {user?.initials ?? "?"}
           </div>
           <div className="min-w-0">
             <div className="truncate text-[12px] font-medium text-ink">
-              {user.name}
+              {user?.name ?? user?.email ?? "Unknown"}
             </div>
             <div className="truncate text-[10px] text-ink-3">
-              {user.email}
+              {user?.email}
             </div>
           </div>
         </div>
